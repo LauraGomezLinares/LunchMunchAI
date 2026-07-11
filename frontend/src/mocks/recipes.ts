@@ -1,0 +1,72 @@
+import { Recipe } from '../types';
+
+export const mockedRecipes: Recipe[] = [
+  {
+    id: 'recipe-01',
+    title: 'Buddha Bowl de Quinua',
+    category: 'Comidas Saludables',
+    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+    calories: 520,
+    timeMinutes: 25,
+    difficulty: 'Fácil',
+    tags: ['vegetarian', 'quick'],
+    allergens: ['soy'],
+    ingredients: ['Quinua', 'Cebolla', 'Pimiento', 'Aguacate', 'Garbanzos', 'Espinaca'],
+    steps: [
+      'Cocinar la quinua y reservar.',
+      'Saltear vegetales con especias.',
+      'Armar el bowl con quinua, vegetales y hummus.',
+      'Agregar limón y semillas al final.',
+    ],
+    nutrition: {
+      protein: 18,
+      carbs: 65,
+      fat: 20,
+    },
+  },
+  {
+    id: 'recipe-02',
+    title: 'Salteado de Pollo y Verduras',
+    category: 'Proteínas',
+    image: 'https://images.unsplash.com/photo-1512058564366-c9e6d3d3e8d7?auto=format&fit=crop&w=800&q=80',
+    calories: 430,
+    timeMinutes: 20,
+    difficulty: 'Fácil',
+    tags: ['high_protein', 'quick'],
+    allergens: ['soy'],
+    ingredients: ['Pechuga de pollo', 'Brócoli', 'Zanahoria', 'Salsa de soya', 'Arroz integral'],
+    steps: [
+      'Marinar el pollo con limón y ajo.',
+      'Cocinar el arroz integral.',
+      'Saltear el pollo y vegetales juntos.',
+      'Servir con arroz y semillas de sésamo.',
+    ],
+    nutrition: {
+      protein: 35,
+      carbs: 48,
+      fat: 10,
+    },
+  },
+  {
+    id: 'recipe-03',
+    title: 'Smoothie Energético de Frutos Rojos',
+    category: 'Bebidas',
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
+    calories: 260,
+    timeMinutes: 10,
+    difficulty: 'Fácil',
+    tags: ['vegetarian', 'quick'],
+    allergens: ['dairy'],
+    ingredients: ['Fresas', 'Banano', 'Yogur natural', 'Leche de almendra', 'Miel'],
+    steps: [
+      'Licuar todos los ingredientes hasta obtener textura homogénea.',
+      'Servir con cubitos de hielo.',
+      'Agregar topping de granola si se desea.',
+    ],
+    nutrition: {
+      protein: 8,
+      carbs: 52,
+      fat: 6,
+    },
+  },
+];
