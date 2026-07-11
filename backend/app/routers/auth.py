@@ -4,6 +4,8 @@ from app.db.session import get_session
 from app.models.user import User, UserCreate, UserResponse
 import uuid
 
+from app.core.security import verify_api_key
+
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
 
 # Comentario de Estructuración:
@@ -12,8 +14,12 @@ router = APIRouter(prefix="/auth", tags=["Autenticación"])
 # Como el frontend enviará el token Bearer en el header de autorización, aquí implementamos el esqueleto para
 # registrar usuarios localmente de forma provisional para desarrollo rápido.
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_218_CREATED if hasattr(status, 'HTTP_218_CREATED') else 201)
-async def register(user_data: UserCreate, session: Session = Depends(get_session)):
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(
+    user_data: UserCreate, 
+    session: Session = Depends(get_session),
+    api_key: str = Depends(verify_api_key)
+):
     """
     Registra un nuevo usuario con sus restricciones/alergias iniciales.
     """

@@ -5,6 +5,8 @@ from uuid import UUID
 from app.db.session import get_session
 from app.models.pantry import PantryItem, PantryItemCreate, PantryItemUpdate
 
+from app.core.security import verify_api_key
+
 router = APIRouter(prefix="/pantry", tags=["Inventario Despensa"])
 
 # Comentario de Estructuración:
@@ -15,7 +17,8 @@ router = APIRouter(prefix="/pantry", tags=["Inventario Despensa"])
 async def create_pantry_item(
     usuario_id: UUID, 
     item_data: PantryItemCreate, 
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    api_key: str = Depends(verify_api_key)
 ):
     """
     Agrega un nuevo ingrediente al inventario de despensa del usuario.
@@ -30,7 +33,11 @@ async def create_pantry_item(
     return new_item
 
 @router.get("/{usuario_id}", response_model=List[PantryItem])
-async def list_pantry_items(usuario_id: UUID, session: Session = Depends(get_session)):
+async def list_pantry_items(
+    usuario_id: UUID, 
+    session: Session = Depends(get_session),
+    api_key: str = Depends(verify_api_key)
+):
     """
     Obtiene la lista completa de ingredientes del inventario de despensa de un usuario.
     """
@@ -42,7 +49,8 @@ async def list_pantry_items(usuario_id: UUID, session: Session = Depends(get_ses
 async def update_pantry_item(
     item_id: UUID, 
     item_update: PantryItemUpdate, 
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
+    api_key: str = Depends(verify_api_key)
 ):
     """
     Actualiza la cantidad, unidad, fecha de caducidad o nombre de un ingrediente en la despensa.
@@ -61,7 +69,11 @@ async def update_pantry_item(
     return db_item
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_pantry_item(item_id: UUID, session: Session = Depends(get_session)):
+async def delete_pantry_item(
+    item_id: UUID, 
+    session: Session = Depends(get_session),
+    api_key: str = Depends(verify_api_key)
+):
     """
     Elimina un ingrediente de la despensa del usuario.
     """
