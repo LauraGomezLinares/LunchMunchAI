@@ -1,29 +1,24 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
-    "version": "1.0.0",
+    "name": "LunchMunchAI",
+    "slug": "lunchmunchai",
+    "scheme": "lunchmunchai",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
+        "backgroundColor": "#FAF7F2"
+      }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
