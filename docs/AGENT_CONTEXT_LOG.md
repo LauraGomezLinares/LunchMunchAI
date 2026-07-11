@@ -24,21 +24,22 @@
 
 | Campo | Valor |
 |---|---|
-| Fecha de última actualización | `[COMPLETAR]` |
-| Feature en curso | `[COMPLETAR: ej. FEAT-03]` |
-| % avance estimado del backend | `[COMPLETAR]` |
-| Bloqueador activo (si existe) | `[COMPLETAR o "Ninguno"]` |
-| Último endpoint FastAPI modificado | `[COMPLETAR: ej. POST /suggest]` |
-| Última decisión de arquitectura | `[COMPLETAR — referenciar ADR # de SYSTEM_ARCHITECTURE.md]` |
-| Próximo paso inmediato | `[COMPLETAR: la tarea concreta que sigue]` |
+| Fecha de última actualización | `09 de Julio de 2026` |
+| Feature en curso | `FEAT-01 a FEAT-05 (Skeletons de lógica y estructura base)` |
+| % avance estimado del backend | `20%` |
+| Bloqueador activo (si existe) | `Ninguno` |
+| Último endpoint FastAPI modificado | `Skeletons en /auth, /pantry, /recipes, /markets` |
+| Última decisión de arquitectura | `Definición de estructura y uso de SQLite como fallback de Azure SQL` |
+| Próximo paso inmediato | `Configuración de inyección dinámica de contexto (alergias) e integración con Azure AI` |
 
 ---
 
 ## 2. Pendientes críticos abiertos (checklist viva, se tacha, no se borra)
 
-- [ ] Definir mecanismo de auth definitivo — Azure Entra ID vs Firebase (detectado en Sesión 0).
-- [ ] Configurar inyección dinámica de contexto (alergias/preferencias) desde Azure SQL hacia el System Prompt para ahorrar tokens.
-- [ ] `[COMPLETAR]`
+- [ ] Definir mecanismo de auth definitivo — Azure Entra ID vs Firebase.
+- [ ] Configurar inyección dinámica de contexto (alergias/preferencias) desde base de datos hacia el System Prompt para ahorrar tokens.
+- [ ] Integrar el cliente de Azure AI Foundry y Azure AI Search reales en el servicio `azure_ai.py`.
+- [ ] Configurar las migraciones automáticas mediante Alembic (`alembic init`).
 
 > Cuando un pendiente se resuelve, se marca `[x]` y se referencia la entrada de bitácora donde se resolvió — no se elimina de la lista (sirve como trazabilidad histórica).
 
@@ -46,27 +47,39 @@
 
 ## 3. Historial de sesiones (agregar entradas nuevas AL FINAL, orden cronológico)
 
-### Plantilla para nueva entrada (copiar y pegar debajo de la última)
-
-```markdown
-### Sesión [N] — [fecha]
-**Agente/modelo usado:** [ej. gpt-4o-mini / gpt-4o / Claude 3.5]
-**Feature(s) trabajada(s):** [ID de SPEC_FEATURES.md]
+### Sesión 1 — 09 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** FEAT-01, FEAT-02, FEAT-03, FEAT-04, FEAT-05 (Estructura base)
 
 **Qué se hizo:**
-- [Resumen funcional en 2-4 líneas, sin pegar código]
+- Creada la estructura base del backend de FastAPI en la carpeta `backend/`.
+- Creado `requirements.txt` con todas las dependencias principales (SQLModel, FastAPI, Azure AI SDK, etc.) y `.env.example`.
+- Configurado Pydantic-Settings en `backend/app/core/config.py` y sesión base SQLModel en `backend/app/db/session.py`.
+- Implementados los skeletons y enrutadores asíncronos para `/auth`, `/pantry` (CRUD), `/recipes` y `/markets`.
+- Añadidos skeletons de servicios para Azure AI, Google Maps y procesamiento de imágenes.
+- Actualizado el `README.md` del repositorio con una guía completa de configuración paso a paso y comandos de Git.
 
 **Impacto en Frontend (React Native):**
-- [Detallar si cambió algún payload JSON, si hay una nueva ruta REST, o si se requiere enviar un nuevo header]
+- Los enrutadores devuelven payloads JSON estructurados listos para ser consumidos por el equipo de frontend.
+- Se configuró CORS de manera abierta temporalmente para permitir llamadas de depuración locales.
 
 **Archivos modificados/creados:**
-- `ruta/al/archivo.py` — [qué cambió, en una frase]
+- `backend/requirements.txt` — Dependencias iniciales.
+- `backend/.env.example` — Plantilla de configuración.
+- `backend/app/main.py` — Inicialización de FastAPI.
+- `backend/app/core/config.py` — Configuración mediante Pydantic.
+- `backend/app/db/session.py` — Conector de BD (SQLite/Azure SQL).
+- `backend/app/models/` — Modelos SQLModel de usuario y despensa.
+- `backend/app/routers/` — Rutas estructuradas de negocio.
+- `backend/app/services/` — Skeletons de llamadas externas y procesamiento.
+- `README.md` — Manual de configuración, ejecución y Git.
+- `docs/AGENT_CONTEXT_LOG.md` — Actualizada la bitácora operativa.
 
 **Decisiones tomadas:**
-- [Si aplica, referenciar también en SYSTEM_ARCHITECTURE.md §9 ADR]
+- Se implementó una base de datos local SQLite temporal como fallback automático si no está configurada la cadena de conexión de Azure SQL para facilitar el desarrollo local e independiente de la conectividad en la nube.
 
 **Problemas encontrados / no resueltos:**
-- [Detalle del bloqueador, con el mensaje de error exacto si es técnico]
+- Ninguno técnico.
 
 **Próximo paso sugerido para la siguiente sesión:**
-- [Instrucción concreta y accionable]
+- Crear la instancia de base de datos en Azure SQL y configurar las migraciones iniciales de base de datos con Alembic para que no se pierdan datos en producción.
