@@ -24,13 +24,13 @@
 
 | Campo | Valor |
 |---|---|
-| Fecha de última actualización | `09 de Julio de 2026` |
-| Feature en curso | `FEAT-01 a FEAT-05 (Skeletons de lógica y estructura base)` |
-| % avance estimado del backend | `20%` |
+| Fecha de última actualización | `11 de Julio de 2026` |
+| Feature en curso | `FEAT-01 a FEAT-05 (Configuración de base de datos y migraciones con Alembic)` |
+| % avance estimado del backend | `25%` |
 | Bloqueador activo (si existe) | `Ninguno` |
-| Último endpoint FastAPI modificado | `Skeletons en /auth, /pantry, /recipes, /markets` |
-| Última decisión de arquitectura | `Definición de estructura y uso de SQLite como fallback de Azure SQL` |
-| Próximo paso inmediato | `Configuración de inyección dinámica de contexto (alergias) e integración con Azure AI` |
+| Último endpoint FastAPI modificado | `Integración de base de datos física SQLite en local` |
+| Última decisión de arquitectura | `Configuración de Alembic usando SQLModel.metadata y url local` |
+| Próximo paso inmediato | `Ejecutar la migración inicial de base de datos en local y levantar el servidor FastAPI` |
 
 ---
 
@@ -39,7 +39,7 @@
 - [ ] Definir mecanismo de auth definitivo — Azure Entra ID vs Firebase.
 - [ ] Configurar inyección dinámica de contexto (alergias/preferencias) desde base de datos hacia el System Prompt para ahorrar tokens.
 - [ ] Integrar el cliente de Azure AI Foundry y Azure AI Search reales en el servicio `azure_ai.py`.
-- [ ] Configurar las migraciones automáticas mediante Alembic (`alembic init`).
+- [x] Configurar las migraciones automáticas mediante Alembic (`alembic init`). *(Resuelto en Sesión 2)*
 
 > Cuando un pendiente se resuelve, se marca `[x]` y se referencia la entrada de bitácora donde se resolvió — no se elimina de la lista (sirve como trazabilidad histórica).
 
@@ -83,3 +83,35 @@
 
 **Próximo paso sugerido para la siguiente sesión:**
 - Crear la instancia de base de datos en Azure SQL y configurar las migraciones iniciales de base de datos con Alembic para que no se pierdan datos en producción.
+
+---
+
+### Sesión 2 — 11 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Configuración de Base de Datos y Migraciones (Alembic + SQLModel)
+
+**Qué se hizo:**
+- Configuración de `alembic/env.py` añadiendo el parent path, importando SQLModel, cargando explícitamente los modelos (`User`, `PantryItem`) y asociando `target_metadata = SQLModel.metadata`.
+- Modificación de `alembic.ini` para establecer la URL de la base de datos sqlite local en `sqlite:///./lunchmunch.db`.
+- Actualización de estados de `FEAT-01` y `FEAT-02` en `docs/SPEC_FEATURES.md` a `🟡 En progreso` eliminando marcas de bloqueante de auth en dependencias.
+- Inclusión de instrucciones sobre migraciones en `README.md`.
+- Documentación de los pasos restantes para que el usuario ejecute la migración inicial en su entorno local con PowerShell.
+
+**Impacto en Frontend (React Native):**
+- Ninguno de momento, sentando las bases físicas del almacenamiento relacional de datos locales.
+
+**Archivos modificados/creados:**
+- `backend/alembic/env.py` — Configuración de entorno y metadatos.
+- `backend/alembic.ini` — Cadena de conexión sqlite.
+- `docs/SPEC_FEATURES.md` — Estados de las features principales y dependencias limpias.
+- `README.md` — Instrucciones de Alembic en la sección de inicio rápido.
+- `docs/AGENT_CONTEXT_LOG.md` — Actualización del estado actual e historial.
+
+**Decisiones tomadas:**
+- Se enlazaron los modelos de SQLModel explícitamente en `env.py` para asegurar que el sistema detecte cambios en `User` y `PantryItem`.
+
+**Problemas encontrados / no resueltos:**
+- El agente no posee permisos directos de ejecución para comandos en el host, por lo que el usuario debe ejecutar los comandos de migración (`alembic revision` y `alembic upgrade head`) y levantar el servidor FastAPI (`uvicorn app.main:app --reload`) manualmente.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Ejecutar la prueba de humo del backend levantando el servidor FastAPI y verificando los endpoints locales una vez generadas y aplicadas las migraciones físicas.

@@ -54,6 +54,14 @@ cp backend/.env.example backend/.env
 ```
 *Edita el archivo `backend/.env` con tus credenciales locales de Azure, API keys de Google Maps, etc.*
 
+### 6. Ejecutar las Migraciones de la Base de Datos (Alembic)
+Con el entorno virtual activado, ve al directorio `backend/` y aplica las migraciones existentes para generar la base de datos local SQLite (o actualizar el motor de base de datos correspondiente):
+```bash
+cd backend
+alembic upgrade head
+```
+*(Para generar nuevas migraciones tras modificar los modelos en `app/models/`, utiliza `alembic revision --autogenerate -m "Descripción del cambio"`)*
+
 ---
 
 ## 🏃 Ejecución del Servidor de Desarrollo

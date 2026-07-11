@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # APIs de Terceros (Google Maps)
     GOOGLE_MAPS_API_KEY: Optional[str] = None
 
+    # Seguridad e Integración
+    AZURE_AGENT_API_KEY: str = "dev-key-lunchmunch-123" # Valor por defecto seguro para desarrollo local
+
     # Permite cargar variables desde un archivo .env si existe
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),

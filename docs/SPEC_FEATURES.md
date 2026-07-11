@@ -23,7 +23,7 @@
 
 ## FEAT-01 — Registro y configuración de perfil (Alergias/Restricciones)
 **Trazabilidad:** HU-01 / CU01, CU03
-**Estado:** `[COMPLETAR]`
+**Estado:** 🟡 En progreso
 **Prioridad:** Alta
 
 **Descripción funcional:**
@@ -50,17 +50,17 @@ Como usuario, quiero registrar mi cuenta y configurar mis restricciones dietéti
 ```
 
 **Criterios de aceptación:**
-- [ ] Registro de credenciales validado mediante `[COMPLETAR: mecanismo de auth definitivo — ver inconsistencia en SYSTEM_ARCHITECTURE.md sección 3]`
+- [ ] Registro de credenciales validado mediante el mecanismo de autenticación (Azure Entra ID vs Firebase a decidir).
 - [ ] Los alérgenos seleccionados se guardan correctamente y son recuperables en el perfil.
 - [ ] Rechaza registro con email duplicado (código de error específico).
 
-**Dependencias:** Definir mecanismo de autenticación (bloqueante, ver nota en SYSTEM_ARCHITECTURE.md).
+**Dependencias:** FEAT-01 (Mecanismo de autenticación).
 
 ---
 
 ## FEAT-02 — Gestión de inventario de despensa (CRUD)
 **Trazabilidad:** HU-02 / CU04
-**Estado:** `[COMPLETAR]`
+**Estado:** 🟡 En progreso
 **Prioridad:** Alta
 
 **Descripción funcional:**
@@ -81,7 +81,7 @@ Como usuario, quiero agregar, modificar, visualizar o eliminar ingredientes de m
 
 **Criterios de aceptación:**
 - [ ] Soporta las 4 operaciones CRUD sin latencia perceptible (`[COMPLETAR: umbral en ms]`).
-- [ ] Sincronización correcta con la base de datos relacional (Azure SQL).
+- [ ] Sincronización correcta con la base de datos relacional.
 - [ ] Maneja el campo `fecha_caducidad` para uso posterior en FEAT-03 (priorización de perecibles).
 
 **Dependencias:** FEAT-01 (usuario debe existir).
@@ -223,8 +223,8 @@ Como usuario consciente de mi salud, quiero visualizar la información nutricion
 
 | ID | Nombre | Estado | Prioridad | Endpoint (ver SYSTEM_ARCHITECTURE.md §8) |
 |---|---|---|---|---|
-| FEAT-01 | Registro y perfil | `[COMPLETAR]` | Alta | `/auth/register` |
-| FEAT-02 | Inventario despensa | `[COMPLETAR]` | Alta | `/pantry` |
+| FEAT-01 | Registro y perfil | 🟡 En progreso | Alta | `/auth/register` |
+| FEAT-02 | Inventario despensa | 🟡 En progreso | Alta | `/pantry` |
 | FEAT-03 | Generación de receta | `[COMPLETAR]` | Alta | `/suggest` |
 | FEAT-04 | Geolocalización mercados | `[COMPLETAR]` | Media | `/markets/nearby` |
 | FEAT-05 | Info nutricional | `[COMPLETAR]` | Baja | `/recipes/{id}/nutrition` |

@@ -1,6 +1,6 @@
 from typing import List, Optional
 from uuid import UUID, uuid4
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, JSON
 
 class UserBase(SQLModel):
     nombre: str
@@ -13,10 +13,13 @@ class User(UserBase, table=True):
     """
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     hashed_password: str
-    alergias: List[str] = Field(default=[], sa_column=None) # Almacenado como JSON en BD o tabla relacional
+    alergias: List[str] = Field(default=[], sa_type=JSON) # Almacenado como JSON en BD
     
     # Relación uno-a-muchos con ingredientes de despensa
-    pantry_items: List["PantryItem"] = Relationship(back_populates="usuario")
+    pantry_items: List["PantryItem"] = Relationship(
+        back_populates="usuario",
+        sa_relationship_kwargs={"lazy": "selectin"}
+    )
 
 class UserCreate(UserBase):
     password: str
