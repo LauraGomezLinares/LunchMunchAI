@@ -1,72 +1,55 @@
-import { Recipe } from '../types';
+import type { Recipe, Ingredient, Market } from '../types';
 
-export const mockedRecipes: Recipe[] = [
+export const mockIngredients: Ingredient[] = [
+  { id: '1', name: 'Tomate', category: 'Verduras' },
+  { id: '2', name: 'Aguacate', category: 'Verduras' },
+  { id: '3', name: 'Tortilla de maíz', category: 'Granos' },
+  { id: '4', name: 'Pollo', category: 'Proteínas' },
+  { id: '5', name: 'Arroz', category: 'Granos' },
+  { id: '6', name: 'Queso fresco', category: 'Lácteos' },
+];
+
+export const mockRecipes: Recipe[] = [
   {
-    id: 'recipe-01',
-    title: 'Buddha Bowl de Quinua',
-    category: 'Comidas Saludables',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-    calories: 520,
-    timeMinutes: 25,
-    difficulty: 'Fácil',
-    tags: ['vegetarian', 'quick'],
-    allergens: ['soy'],
-    ingredients: ['Quinua', 'Cebolla', 'Pimiento', 'Aguacate', 'Garbanzos', 'Espinaca'],
-    steps: [
-      'Cocinar la quinua y reservar.',
-      'Saltear vegetales con especias.',
-      'Armar el bowl con quinua, vegetales y hummus.',
-      'Agregar limón y semillas al final.',
-    ],
-    nutrition: {
-      protein: 18,
-      carbs: 65,
-      fat: 20,
-    },
-  },
-  {
-    id: 'recipe-02',
-    title: 'Salteado de Pollo y Verduras',
-    category: 'Proteínas',
-    image: 'https://images.unsplash.com/photo-1512058564366-c9e6d3d3e8d7?auto=format&fit=crop&w=800&q=80',
-    calories: 430,
-    timeMinutes: 20,
-    difficulty: 'Fácil',
-    tags: ['high_protein', 'quick'],
-    allergens: ['soy'],
-    ingredients: ['Pechuga de pollo', 'Brócoli', 'Zanahoria', 'Salsa de soya', 'Arroz integral'],
-    steps: [
-      'Marinar el pollo con limón y ajo.',
-      'Cocinar el arroz integral.',
-      'Saltear el pollo y vegetales juntos.',
-      'Servir con arroz y semillas de sésamo.',
-    ],
-    nutrition: {
-      protein: 35,
-      carbs: 48,
-      fat: 10,
-    },
-  },
-  {
-    id: 'recipe-03',
-    title: 'Smoothie Energético de Frutos Rojos',
-    category: 'Bebidas',
+    id: 'r1',
+    title: 'Bowl de quinoa saludable',
+    category: 'Almuerzo',
+    time: 20,
+    calories: 480,
+    ingredients: ['Quinoa', 'Tomate', 'Aguacate', 'Pollo'],
+    steps: ['Cocina quinoa', 'Añade vegetales', 'Sirve con pollo'],
+    allergens: ['None'],
+    nutrition: { protein: 28, carbs: 45, fat: 18 },
     image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
-    calories: 260,
-    timeMinutes: 10,
-    difficulty: 'Fácil',
-    tags: ['vegetarian', 'quick'],
-    allergens: ['dairy'],
-    ingredients: ['Fresas', 'Banano', 'Yogur natural', 'Leche de almendra', 'Miel'],
-    steps: [
-      'Licuar todos los ingredientes hasta obtener textura homogénea.',
-      'Servir con cubitos de hielo.',
-      'Agregar topping de granola si se desea.',
-    ],
-    nutrition: {
-      protein: 8,
-      carbs: 52,
-      fat: 6,
-    },
   },
+  {
+    id: 'r2',
+    title: 'Tacos de pollo con salsa',
+    category: 'Cena',
+    time: 15,
+    calories: 520,
+    ingredients: ['Tortilla de maíz', 'Pollo', 'Tomate', 'Aguacate'],
+    steps: ['Marca pollo', 'Arma tacos', 'Añade salsa'],
+    allergens: ['Lácteos'],
+    nutrition: { protein: 30, carbs: 40, fat: 22 },
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: 'r3',
+    title: 'Ensalada rápida de atún',
+    category: 'Desayuno',
+    time: 10,
+    calories: 360,
+    ingredients: ['Atún', 'Tomate', 'Aguacate'],
+    steps: ['Mezcla ingredientes', 'Sirve frío'],
+    allergens: ['Pescado'],
+    nutrition: { protein: 24, carbs: 18, fat: 14 },
+    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
+  },
+];
+
+export const mockMarkets: Market[] = [
+  { id: 'm1', name: 'Mercado Santa Anita', address: 'Av. Brasil 123', coords: { latitude: -12.0464, longitude: -77.0428 } },
+  { id: 'm2', name: 'Mercado de Surquillo', address: 'Av. Benavides 456', coords: { latitude: -12.1200, longitude: -77.0300 } },
+  { id: 'm3', name: 'Mercado de San Miguel', address: 'Av. La Marina 789', coords: { latitude: -12.0760, longitude: -77.0860 } },
 ];

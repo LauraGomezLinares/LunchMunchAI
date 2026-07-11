@@ -1,58 +1,47 @@
-export type DietaryPreference = 'vegetarian' | 'vegan' | 'omnivore' | 'low_carb' | 'high_protein';
-
-export type Allergen = 'gluten' | 'dairy' | 'nuts' | 'soy' | 'seafood' | 'eggs';
-
-export interface UserProfile {
-  name: string;
-  email: string;
-  age: number;
-  location: string;
-  preferences: DietaryPreference[];
-  allergens: Allergen[];
-}
-
-export interface AuthUser extends UserProfile {
+export type Ingredient = {
   id: string;
-  password: string;
-  token: string;
-  onboardCompleted: boolean;
-}
+  name: string;
+  category: string;
+  icon?: string;
+};
 
-export interface Recipe {
+export type Recipe = {
   id: string;
   title: string;
-  category: string;
-  image: string;
+  category: 'Desayuno' | 'Almuerzo' | 'Cena' | 'Snack';
+  time: number;
   calories: number;
-  timeMinutes: number;
-  difficulty: 'Fácil' | 'Intermedio' | 'Avanzado';
-  tags: string[];
-  allergens: Allergen[];
   ingredients: string[];
   steps: string[];
+  allergens: string[];
   nutrition: {
     protein: number;
     carbs: number;
     fat: number;
   };
-}
+  image: string;
+};
 
-export interface PantryItem {
-  id: string;
-  name: string;
-  category: string;
-  quantity: string;
-  freshness: 'Alta' | 'Media' | 'Baja';
-  icon: string;
-}
-
-export interface Market {
+export type Market = {
   id: string;
   name: string;
   address: string;
-  distance: string;
-  coords: {
-    latitude: number;
-    longitude: number;
-  };
-}
+  coords: { latitude: number; longitude: number };
+};
+
+export type UserProfile = {
+  name: string;
+  email: string;
+  allergies: string[];
+  preferences: string[];
+  restrictions: string[];
+};
+
+export type AppState = {
+  isAuthenticated: boolean;
+  onboardingComplete: boolean;
+  user: UserProfile | null;
+  pantry: Ingredient[];
+  token: string | null;
+  isHydrated: boolean;
+};

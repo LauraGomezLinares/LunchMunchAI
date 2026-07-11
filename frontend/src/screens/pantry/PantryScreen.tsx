@@ -1,69 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { usePantryStore } from '@store/pantryStore';
-import PrimaryButton from '@components/ui/PrimaryButton';
-import PantryItemCard from '@components/features/PantryItemCard';
-import { COLORS } from '@constants/colors';
-import { TYPOGRAPHY } from '@constants/typography';
-import SectionTitle from '@components/ui/SectionTitle';
+import React from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Button from '../../components/ui/Button';
+import { COLORS } from '../../constants/colors';
+import { TYPOGRAPHY } from '../../constants/typography';
+import { mockIngredients } from '../../mocks/recipes';
+import { useAppStore } from '../../store/useAppStore';
 
 export default function PantryScreen() {
-  const { items, initialize, removeItem } = usePantryStore();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      await initialize();
-      setLoading(false);
-    }
-    load();
-  }, [initialize]);
+  const pantry = useAppStore((state) => state.pantry);
+  const addPantryItem = useAppStore((state) => state.addPantryItem);
+  const removePantryItem = useAppStore((state) => state.removePantryItem);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <SectionTitle title="Despensa" subtitle="Gestiona los ingredientes que tienes en casa." />
-      {loading ? (
-        <Text style={styles.placeholder}>Cargando despensa...</Text>
-      ) : (
-        items.map((item) => (
-          <PantryItemCard key={item.id} item={item} onRemove={() => removeItem(item.id)} />
-        ))
-      )}
-      <View style={styles.helpBox}>
-        <Text style={styles.helpTitle}>Agregar ingrediente</Text>
-        <Text style={styles.helpText}>Placeholder para formulario de nueva despensa. Aquí se integrará la lógica futura de creación.</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Despensa</Text>
+        <Text style={styles.subtitle}>Añade o elimina ingredientes para personalizar tus recetas.</Text>
+        {mockIngredients.map((item) => (
+          <View key={item.id} style={styles.row}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            {pantry.some((i) => i.id === item.id) ? (
+              <Button title="Quitar" onPress={() => removePantryItem(item.id)} variant="secondary" style={styles.smallButton} />
+            ) : (
+              <Button title="Añadir" onPress={() => addPantryItem(item)} style={styles.smallButton} />
+            )}
+          </View>
+        ))}
+        <FlatList data={pantry} keyExtractor={(item) => item.id} renderItem={({ item }) => <Text style={styles.pantryItem}>• {item.name}</Text>} />
       </View>
-      <PrimaryButton title="Agregar ingrediente" onPress={() => Alert.alert('Funcionalidad en construcción', 'Aquí se agregará la lógica de añadir ingredientes.')} />
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  contentContainer: {
-    padding: 24,
-  },
-  placeholder: {
-    color: COLORS.textSecondary,
-  },
-  helpBox: {
-    backgroundColor: COLORS.surfaceAlt,
-    borderRadius: 20,
-    padding: 20,
-    marginVertical: 20,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  helpTitle: {
-    ...TYPOGRAPHY.subtitle,
-    color: COLORS.textPrimary,
-    marginBottom: 8,
-  },
-  helpText: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
-  },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  content: { flex: 1, padding: 16 },
+  title: { ...TYPOGRAPHY.title, color: COLORS.textPrimary },
+  subtitle: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginTop: 6, marginBottom: 16 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.surface, padding: 12, borderRadius: 14, marginBottom: 8 },
+  itemName: { ...TYPOGRAPHY.body, color: COLORS.textPrimary },
+  smallButton: { minHeight: 36, paddingVertical: 6, paddingHorizontal: 12 },
+  pantryItem: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginTop: 6 },
 });

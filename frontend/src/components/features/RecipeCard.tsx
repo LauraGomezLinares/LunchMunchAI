@@ -1,111 +1,34 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
-import { COLORS } from '@constants/colors';
-import { Recipe } from '@types';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { COLORS } from '../../constants/colors';
+import { TYPOGRAPHY } from '../../constants/typography';
+import type { Recipe } from '../../types';
 
-interface RecipeCardProps {
+type Props = {
   recipe: Recipe;
   onPress: () => void;
-  incompatible?: boolean;
-}
+  isIncompatible?: boolean;
+};
 
-export default function RecipeCard({ recipe, onPress, incompatible }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onPress, isIncompatible = false }: Props) {
   return (
-    <TouchableOpacity style={[styles.card, incompatible && styles.incompatible]} onPress={onPress} activeOpacity={0.8}>
+    <Pressable onPress={onPress} style={styles.card}>
       <Image source={{ uri: recipe.image }} style={styles.image} />
-      <View style={styles.info}>
+      {isIncompatible ? <View style={styles.badge}><Text style={styles.badgeText}>Incompatible</Text></View> : null}
+      <View style={styles.content}>
         <Text style={styles.title}>{recipe.title}</Text>
-        <View style={styles.row}>
-          <Text style={styles.meta}>{recipe.timeMinutes} min</Text>
-          <Text style={styles.meta}>{recipe.calories} kcal</Text>
-        </View>
-        <View style={styles.badges}>
-          {recipe.allergens.length > 0 && (
-            <View style={styles.allergenBadge}>
-              <Text style={styles.allergenText}>Alergias</Text>
-            </View>
-          )}
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{recipe.category}</Text>
-          </View>
-        </View>
+        <Text style={styles.meta}>{recipe.category} • {recipe.time} min • {recipe.calories} kcal</Text>
       </View>
-      {incompatible ? <View style={styles.overlay}><Text style={styles.overlayText}>Incompatible</Text></View> : null}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 18,
-    overflow: 'hidden',
-    marginBottom: 16,
-    elevation: 2,
-  },
-  incompatible: {
-    borderWidth: 1,
-    borderColor: COLORS.error,
-  },
-  image: {
-    width: '100%',
-    height: 160,
-  },
-  info: {
-    padding: 16,
-  },
-  title: {
-    color: COLORS.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  meta: {
-    color: COLORS.textSecondary,
-    fontSize: 13,
-  },
-  badges: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  allergenBadge: {
-    backgroundColor: COLORS.error,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  categoryBadge: {
-    backgroundColor: COLORS.secondaryLight,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  allergenText: {
-    color: COLORS.surface,
-    fontWeight: '600',
-  },
-  categoryText: {
-    color: COLORS.textPrimary,
-    fontWeight: '600',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: 'rgba(230, 57, 70, 0.9)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  overlayText: {
-    color: COLORS.surface,
-    fontWeight: '700',
-    fontSize: 12,
-  },
+  card: { backgroundColor: COLORS.surface, borderRadius: 20, overflow: 'hidden', marginBottom: 16, borderWidth: 1, borderColor: COLORS.border },
+  image: { width: '100%', height: 140 },
+  badge: { position: 'absolute', top: 10, right: 10, backgroundColor: COLORS.error, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  badgeText: { color: COLORS.surface, fontSize: 12, fontWeight: '600' },
+  content: { padding: 12 },
+  title: { ...TYPOGRAPHY.subtitle, fontSize: 18, color: COLORS.textPrimary },
+  meta: { ...TYPOGRAPHY.caption, color: COLORS.textSecondary, marginTop: 4 },
 });

@@ -1,107 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useAuthStore } from '../store/authStore';
-import { RouteNames } from '../constants/routes';
-import SplashScreen from '../screens/SplashScreen';
-import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
-import DietaryProfileScreen from '../screens/onboarding/DietaryProfileScreen';
+import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/home/HomeScreen';
 import PantryScreen from '../screens/pantry/PantryScreen';
 import RecipesListScreen from '../screens/recipes/RecipesListScreen';
 import RecipeDetailScreen from '../screens/recipes/RecipeDetailScreen';
-import NearbyMarketsScreen from '../screens/map/NearbyMarketsScreen';
+import MarketsScreen from '../screens/map/MarketsScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
-import { Ionicons } from '@expo/vector-icons';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { COLORS } from '../constants/colors';
 
-type RootStackParamList = {
-  [RouteNames.Splash]: undefined;
-  [RouteNames.Onboarding]: undefined;
-  [RouteNames.Login]: undefined;
-  [RouteNames.Register]: undefined;
-  [RouteNames.DietaryProfile]: undefined;
-  [RouteNames.Home]: undefined;
-  [RouteNames.Pantry]: undefined;
-  [RouteNames.Recipes]: undefined;
-  [RouteNames.RecipeDetail]: { recipeId: string };
-  [RouteNames.Markets]: undefined;
-  [RouteNames.Profile]: undefined;
-};
+const Tab = createBottomTabNavigator();
+const RecipesStack = createNativeStackNavigator();
 
-type MainTabParamList = {
-  [RouteNames.Home]: undefined;
-  [RouteNames.Pantry]: undefined;
-  [RouteNames.Recipes]: undefined;
-  [RouteNames.Markets]: undefined;
-  [RouteNames.Profile]: undefined;
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
-
-function MainTabs() {
+function RecipesStackScreen() {
   return (
-    <Tab.Navigator
-      initialRouteName={RouteNames.Home}
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarStyle: { height: 70, paddingBottom: 8, backgroundColor: '#fff' },
-        tabBarActiveTintColor: '#2D9F6F',
-        tabBarInactiveTintColor: '#5C6B66',
-        tabBarIcon: ({ focused, color, size }) => {
-          const icons: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap> = {
-            [RouteNames.Home]: 'home-outline',
-            [RouteNames.Pantry]: 'basket-outline',
-            [RouteNames.Recipes]: 'fast-food-outline',
-            [RouteNames.Markets]: 'map-outline',
-            [RouteNames.Profile]: 'person-circle-outline',
-          };
-          const iconName = icons[route.name as keyof MainTabParamList] ?? 'ellipse-outline';
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name={RouteNames.Home} component={HomeScreen} options={{ title: 'Inicio' }} />
-      <Tab.Screen name={RouteNames.Pantry} component={PantryScreen} options={{ title: 'Despensa' }} />
-      <Tab.Screen name={RouteNames.Recipes} component={RecipesListScreen} options={{ title: 'Recetas' }} />
-      <Tab.Screen name={RouteNames.Markets} component={NearbyMarketsScreen} options={{ title: 'Mercados' }} />
-      <Tab.Screen name={RouteNames.Profile} component={ProfileScreen} options={{ title: 'Perfil' }} />
-    </Tab.Navigator>
+    <RecipesStack.Navigator>
+      <RecipesStack.Screen name="RecipesList" component={RecipesListScreen} options={{ title: 'Recetas' }} />
+      <RecipesStack.Screen name="RecipeDetail" component={RecipeDetailScreen} options={{ title: 'Detalle' }} />
+    </RecipesStack.Navigator>
   );
 }
 
 export default function AppNavigator() {
-  const { token, loading, onboardCompleted } = useAuthStore();
-  const [initialRoute, setInitialRoute] = useState(RouteNames.Splash);
-
-  useEffect(() => {
-    if (!loading) {
-      if (!token) {
-        setInitialRoute(RouteNames.Onboarding);
-      } else if (!onboardCompleted) {
-        setInitialRoute(RouteNames.DietaryProfile);
-      } else {
-        setInitialRoute(RouteNames.Home);
-      }
-    }
-  }, [token, loading, onboardCompleted]);
-
-  if (loading) {
-    return <SplashScreen />;
-  }
-
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
-      <Stack.Screen name={RouteNames.Splash} component={SplashScreen} />
-      <Stack.Screen name={RouteNames.Onboarding} component={OnboardingScreen} />
-      <Stack.Screen name={RouteNames.Login} component={LoginScreen} />
-      <Stack.Screen name={RouteNames.Register} component={RegisterScreen} />
-      <Stack.Screen name={RouteNames.DietaryProfile} component={DietaryProfileScreen} />
-      <Stack.Screen name={RouteNames.Home} component={MainTabs} />
-      <Stack.Screen name={RouteNames.RecipeDetail} component={RecipeDetailScreen} />
-    </Stack.Navigator>
+    <Tab.Navigator screenOptions={({ route }) => ({
+      headerShown: false,
+      tabBarActiveTintColor: COLORS.primary,
+      tabBarInactiveTintColor: COLORS.textMuted,
+      tabBarStyle: { backgroundColor: COLORS.surface, borderTopColor: COLORS.border },
+      tabBarIcon: ({ color, size }) => {
+        const iconName = route.name === 'Home' ? 'home' : route.name === 'Pantry' ? 'basket' : route.name === 'Recipes' ? 'restaurant' : route.name === 'Markets' ? 'map' : 'person';
+        return <Ionicons name={iconName as any} size={size} color={color} />;
+      },
+    })}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Pantry" component={PantryScreen} />
+      <Tab.Screen name="Recipes" component={RecipesStackScreen} />
+      <Tab.Screen name="Markets" component={MarketsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
   );
 }

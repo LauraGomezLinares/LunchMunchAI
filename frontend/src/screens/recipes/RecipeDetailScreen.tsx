@@ -1,135 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
-import { getRecipeById } from '@services/recipesService';
-import { Recipe } from '@types';
-import SectionTitle from '@components/ui/SectionTitle';
-import { COLORS } from '@constants/colors';
-import { RouteNames } from '@constants/routes';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Button from '../../components/ui/Button';
+import { COLORS } from '../../constants/colors';
+import { TYPOGRAPHY } from '../../constants/typography';
 
-type RecipeDetailParams = {
-  [RouteNames.RecipeDetail]: { recipeId: string };
-};
+export default function RecipeDetailScreen({ route }: any) {
+  const recipe = route.params?.recipe;
 
-type Props = NativeStackScreenProps<RecipeDetailParams, RouteNames.RecipeDetail>;
-
-export default function RecipeDetailScreen({ route }: Props) {
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(true);
-  const recipeId = route.params?.recipeId ?? '';
-
-  useEffect(() => {
-    async function load() {
-      if (!recipeId) return;
-      const response = await getRecipeById(recipeId);
-      setRecipe(response ?? null);
-      setLoading(false);
-    }
-    load();
-  }, [recipeId]);
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
-  }
-
-  if (!recipe) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.placeholder}>Receta no encontrada.</Text>
-      </View>
-    );
-  }
+  if (!recipe) return null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <SectionTitle title={recipe.title} subtitle={recipe.category} />
-      <View style={styles.detailsRow}>
-        <Text style={styles.meta}>{recipe.timeMinutes} min</Text>
-        <Text style={styles.meta}>{recipe.calories} kcal</Text>
-        <Text style={styles.meta}>{recipe.difficulty}</Text>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionHeading}>Ingredientes</Text>
-        {recipe.ingredients.map((ingredient: string) => (
-          <Text key={ingredient} style={styles.listItem}>• {ingredient}</Text>
-        ))}
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionHeading}>Preparación</Text>
-        {recipe.steps.map((step: string, index: number) => (
-          <Text key={`${step}-${index}`} style={styles.listItem}>{index + 1}. {step}</Text>
-        ))}
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionHeading}>Información nutricional</Text>
-        <Text style={styles.listItem}>Proteínas: {recipe.nutrition.protein} g</Text>
-        <Text style={styles.listItem}>Carbohidratos: {recipe.nutrition.carbs} g</Text>
-        <Text style={styles.listItem}>Grasas: {recipe.nutrition.fat} g</Text>
-      </View>
-      <TouchableOpacity style={styles.missingButton} onPress={() => Alert.alert('Ingredientes faltantes', 'Aquí se mostrará qué ingredientes te faltan.') }>
-        <Text style={styles.missingText}>Revisar ingredientes faltantes</Text>
-      </TouchableOpacity>
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>{recipe.title}</Text>
+        <Text style={styles.meta}>{recipe.category} • {recipe.time} min • {recipe.calories} kcal</Text>
+        <Text style={styles.sectionTitle}>Ingredientes</Text>
+        {recipe.ingredients.map((item: string) => <Text key={item} style={styles.item}>• {item}</Text>)}
+        <Text style={styles.sectionTitle}>Pasos</Text>
+        {recipe.steps.map((step: string, index: number) => <Text key={step} style={styles.item}>{index + 1}. {step}</Text>)}
+        <Text style={styles.sectionTitle}>Información nutricional</Text>
+        <Text style={styles.item}>Proteína: {recipe.nutrition.protein}g</Text>
+        <Text style={styles.item}>Carbohidratos: {recipe.nutrition.carbs}g</Text>
+        <Text style={styles.item}>Grasas: {recipe.nutrition.fat}g</Text>
+        <Button title="Ingredientes faltantes" onPress={() => undefined} style={styles.button} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  contentContainer: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  placeholder: {
-    color: COLORS.textSecondary,
-  },
-  detailsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 16,
-  },
-  meta: {
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-  },
-  section: {
-    marginBottom: 20,
-    backgroundColor: COLORS.surface,
-    padding: 18,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  sectionHeading: {
-    color: COLORS.textPrimary,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  listItem: {
-    color: COLORS.textSecondary,
-    marginBottom: 10,
-    lineHeight: 22,
-  },
-  missingButton: {
-    backgroundColor: COLORS.secondary,
-    borderRadius: 18,
-    padding: 16,
-    alignItems: 'center',
-  },
-  missingText: {
-    color: COLORS.surface,
-    fontWeight: '700',
-  },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  content: { padding: 16 },
+  title: { ...TYPOGRAPHY.title, color: COLORS.textPrimary },
+  meta: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginTop: 8, marginBottom: 12 },
+  sectionTitle: { ...TYPOGRAPHY.subtitle, color: COLORS.textPrimary, marginTop: 12, marginBottom: 8 },
+  item: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginBottom: 6 },
+  button: { marginTop: 16 },
 });
