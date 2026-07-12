@@ -6,18 +6,27 @@ import { COLORS } from '../../constants/colors';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useAppStore } from '../../store/useAppStore';
 
+import { registerUser } from '../../services/api/auth';
+
 export default function RegisterScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useAppStore((state) => state.login);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name || !email || !password) {
       Alert.alert('Completa tus datos');
       return;
     }
-    login({ name, email, allergies: [], preferences: [], restrictions: [] }, 'fake-token');
+    
+    try {
+      const response = await registerUser(name, email, password);
+      // login se llama automáticamente dentro de registerUser, pero lo volvemos a setear por seguridad
+      login(response.user, response.token);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'No se pudo crear la cuenta');
+    }
   };
 
   return (

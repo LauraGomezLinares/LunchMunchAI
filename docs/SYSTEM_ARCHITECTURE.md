@@ -44,22 +44,23 @@ LunchMunchAI es un asistente inteligente que genera recetas personalizadas a par
 
 | Capa | Tecnología | Estado | Notas |
 |---|---|---|---|
+| Frontend (Cliente Móvil) | React Native (Expo + TypeScript) | En uso | Interfaz móvil con Zustand para estados y React Navigation |
 | Backend framework | FastAPI (Python) | En uso | Orquestador principal, manejo nativo `async/await` |
-| Lenguaje | Python 3.11+ | En uso | Versión estándar recomendada para compatibilidad asíncrona |
+| Lenguaje (Backend) | Python 3.11+ | En uso | Versión estándar recomendada para compatibilidad asíncrona |
 | ORM & Migraciones | SQLModel / SQLAlchemy + Alembic | En uso | Alembic manejará de forma estricta el ciclo de vida de la BD |
 | IA generativa | Azure AI Foundry – Agent Service (gpt-4o-mini) | En uso | Modelo económico y rápido. Automatizado vía SDK |
 | Búsqueda semántica (RAG) | Azure AI Search | En uso | Índice vectorial. Fragmentación con solapamiento controlado |
 | Almacenamiento | Azure Blob Storage | En uso | Almacenamiento de archivos `.md` del RAG e imágenes temporales |
 | Base de datos relacional | Azure SQL Database | En uso | Almacenamiento de usuarios, alergias, perfiles y tablas relacionales |
-| Autenticación | Azure Entra ID (B2C) | En uso | Identidad centralizada basada en JWT y RBAC nativo en Azure |
+| Autenticación | Azure Entra ID (B2C) / API Key | En uso | Identidad basada en JWT/RBAC para cliente y X-API-KEY para agentes |
 | Geolocalización | Google Maps Places API + Geocoding API | En uso | Búsqueda logística en radio de 500m – 1000m |
 
 ---
 
 ## 4. Arquitectura general (diagrama de flujo)
 
-[Cliente React Native]
-│   HTTP/REST (Headers: Authorization: Bearer <JWT>)
+[Cliente Móvil React Native / TS]
+│   HTTP/REST (Autenticación Bearer JWT / API Key local)
 ▼
 [Backend API - FastAPI]
 ├── /routers (auth, pantry, recipes, markets)

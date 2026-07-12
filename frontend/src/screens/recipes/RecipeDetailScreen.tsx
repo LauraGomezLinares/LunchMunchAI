@@ -5,16 +5,50 @@ import Button from '../../components/ui/Button';
 import { COLORS } from '../../constants/colors';
 import { TYPOGRAPHY } from '../../constants/typography';
 
+import { Alert } from 'react-native';
+import { addFavoriteRecipeBackend } from '../../services/api/recipes';
+
 export default function RecipeDetailScreen({ route }: any) {
   const recipe = route.params?.recipe;
+  const [saving, setSaving] = React.useState(false);
 
   if (!recipe) return null;
+
+  const handleSaveFavorite = async () => {
+    setSaving(true);
+    try {
+      await addFavoriteRecipeBackend({
+        title: recipe.title,
+        category: recipe.category,
+        time: recipe.time,
+        calories: recipe.calories,
+        ingredients: recipe.ingredients,
+        steps: recipe.steps,
+        allergens: recipe.allergens || [],
+        nutrition: recipe.nutrition,
+        image: recipe.image
+      });
+      Alert.alert('Éxito', 'Receta guardada en tus favoritos correctamente.');
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'No se pudo guardar la receta en favoritos');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>{recipe.title}</Text>
         <Text style={styles.meta}>{recipe.category} • {recipe.time} min • {recipe.calories} kcal</Text>
+        
+        <Button 
+          title={saving ? "Guardando..." : "Guardar en Favoritos 💛"} 
+          onPress={handleSaveFavorite} 
+          disabled={saving}
+          style={{ marginBottom: 12 }}
+        />
+
         <Text style={styles.sectionTitle}>Ingredientes</Text>
         {recipe.ingredients.map((item: string) => <Text key={item} style={styles.item}>• {item}</Text>)}
         <Text style={styles.sectionTitle}>Pasos</Text>

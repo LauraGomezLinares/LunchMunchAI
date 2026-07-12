@@ -21,6 +21,12 @@ class User(UserBase, table=True):
         sa_relationship_kwargs={"lazy": "selectin"}
     )
 
+    # Relación uno-a-muchos con recetas favoritas
+    favorite_recipes: List["FavoriteRecipe"] = Relationship(
+        back_populates="usuario",
+        sa_relationship_kwargs={"lazy": "selectin", "cascade": "all, delete-orphan"}
+    )
+
 class UserCreate(UserBase):
     password: str
     alergias: List[str] = []

@@ -11,9 +11,15 @@ type Props = {
 };
 
 export default function RecipeCard({ recipe, onPress, isIncompatible = false }: Props) {
+  // Unsplash cambió su API de source.unsplash.com a images.unsplash.com.
+  // Si viene con el formato anterior, la convertimos a un término de búsqueda en images.unsplash o usamos un placeholder por defecto.
+  const imageUrl = recipe.image && !recipe.image.includes('source.unsplash.com') 
+    ? recipe.image 
+    : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500';
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      <Image source={{ uri: recipe.image }} style={styles.image} />
+      <Image source={{ uri: imageUrl }} style={styles.image} />
       {isIncompatible ? <View style={styles.badge}><Text style={styles.badgeText}>Incompatible</Text></View> : null}
       <View style={styles.content}>
         <Text style={styles.title}>{recipe.title}</Text>
