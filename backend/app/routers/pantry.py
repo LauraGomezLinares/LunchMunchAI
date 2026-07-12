@@ -5,7 +5,7 @@ from uuid import UUID
 from app.db.session import get_session
 from app.models.pantry import PantryItem, PantryItemCreate, PantryItemUpdate
 
-from app.core.security import verify_api_key
+from app.core.security import verify_jwt
 
 router = APIRouter(prefix="/pantry", tags=["Inventario Despensa"])
 
@@ -15,16 +15,15 @@ router = APIRouter(prefix="/pantry", tags=["Inventario Despensa"])
 
 @router.post("/", response_model=PantryItem, status_code=status.HTTP_201_CREATED)
 async def create_pantry_item(
-    usuario_id: UUID, 
     item_data: PantryItemCreate, 
     session: Session = Depends(get_session),
-    api_key: str = Depends(verify_api_key)
+    current_user: User = Depends(verify_jwt)
 ):
     """
-    Agrega un nuevo ingrediente al inventario de despensa del usuario.
+    Agrega un nuevo ingrediente al inventario de despensa del usuario autenticado.
     """
     new_item = PantryItem(
-        usuario_id=usuario_id,
+        usuario_id=current_user.id,
         **item_data.model_dump()
     )
     session.add(new_item)
@@ -32,16 +31,15 @@ async def create_pantry_item(
     session.refresh(new_item)
     return new_item
 
-@router.get("/{usuario_id}", response_model=List[PantryItem])
+@router.get("/", response_model=List[PantryItem])
 async def list_pantry_items(
-    usuario_id: UUID, 
     session: Session = Depends(get_session),
-    api_key: str = Depends(verify_api_key)
+    current_user: User = Depends(verify_jwt)
 ):
     """
-    Obtiene la lista completa de ingredientes del inventario de despensa de un usuario.
+    Obtiene la lista completa de ingredientes del inventario de despensa del usuario autenticado.
     """
-    statement = select(PantryItem).where(PantryItem.usuario_id == usuario_id)
+    statement = select(PantryItem).where(PantryItem.usuario_id == current_user.id)
     items = session.exec(statement).all()
     return items
 
@@ -50,14 +48,15 @@ async def update_pantry_item(
     item_id: UUID, 
     item_update: PantryItemUpdate, 
     session: Session = Depends(get_session),
-    api_key: str = Depends(verify_api_key)
+    current_user: User = Depends(verify_jwt)
 ):
     """
-    Actualiza la cantidad, unidad, fecha de caducidad o nombre de un ingrediente en la despensa.
+    Actualiza la cantidad, unidad, fecha de caducidad o nombre de un ingrediente en la despensa del usuario autenticado.
     """
-    db_item = session.get(PantryItem, item_id)
+    statement = select(PantryItem).where(PantryItem.id == item_id, PantryItem.usuario_id == current_user.id)
+    db_item = session.exec(statement).first()
     if not db_item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingrediente no encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingrediente no encontrado o no pertenece al usuario.")
     
     update_data = item_update.model_dump(exclude_unset=True)
     for key, value in update_data.items():
@@ -72,14 +71,15 @@ async def update_pantry_item(
 async def delete_pantry_item(
     item_id: UUID, 
     session: Session = Depends(get_session),
-    api_key: str = Depends(verify_api_key)
+    current_user: User = Depends(verify_jwt)
 ):
     """
-    Elimina un ingrediente de la despensa del usuario.
+    Elimina un ingrediente de la despensa del usuario autenticado.
     """
-    db_item = session.get(PantryItem, item_id)
+    statement = select(PantryItem).where(PantryItem.id == item_id, PantryItem.usuario_id == current_user.id)
+    db_item = session.exec(statement).first()
     if not db_item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingrediente no encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingrediente no encontrado o no pertenece al usuario.")
     session.delete(db_item)
     session.commit()
     return None

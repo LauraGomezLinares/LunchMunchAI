@@ -17,18 +17,18 @@ router = APIRouter(prefix="/auth", tags=["Autenticación"])
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserCreate, 
-    session: Session = Depends(get_session),
-    api_key: str = Depends(verify_api_key)
+    session: Session = Depends(get_session)
 ):
     """
     Registra un nuevo usuario con sus restricciones/alergias iniciales.
     """
-    # Verificar si el usuario ya existe por email
-    statement = select(User).where(User.email == user_data.email)
+    # Verificar si el usuario ya existe por email (case-insensitive)
+    from sqlalchemy import func
+    statement = select(User).where(func.lower(User.email) == func.lower(user_data.email))
     existing_user = session.exec(statement).first()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="El correo electrónico ya está registrado."
         )
     
@@ -51,10 +51,37 @@ async def register(
         perfil={"alergias": new_user.alergias, "objetivos_nutricionales": new_user.objetivos_nutricionales}
     )
 
+from app.models.auth import UserLogin
+
 @router.post("/login")
-async def login():
+async def login(credentials: UserLogin, session: Session = Depends(get_session)):
     """
-    Esqueleto para simulación o integración de Login.
-    En producción, el inicio de sesión se delega a Azure Entra ID B2C y se devuelve un JWT.
+    Inicia sesión verificando las credenciales contra la base de datos (SQLite/Azure SQL).
+    Retorna un token (el ID del usuario en formato string) para persistencia.
     """
-    return {"message": "Inicio de sesión delegado a Azure Entra ID (B2C). Devuelve un Bearer JWT en producción."}
+    from sqlalchemy import func
+    statement = select(User).where(func.lower(User.email) == func.lower(credentials.email))
+    user = session.exec(statement).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="El correo electrónico ingresado no está registrado."
+        )
+        
+    if user.hashed_password != f"hash_{credentials.password}":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta."
+        )
+        
+    return {
+        "token": str(user.id),
+        "user": {
+            "name": user.nombre,
+            "email": user.email,
+            "allergies": user.alergias,
+            "preferences": [],
+            "restrictions": []
+        }
+    }

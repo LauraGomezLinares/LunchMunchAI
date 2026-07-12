@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     AZURE_AI_AGENT_MODEL: str = "gpt-4o-mini"
     AZURE_AI_SEARCH_ENDPOINT: Optional[str] = None
     AZURE_AI_SEARCH_KEY: Optional[str] = None
+    
+    # Integración Real Azure AI Foundry
+    AZURE_AI_ENDPOINT: Optional[str] = "https://lunchmunch-ai-resource.services.ai.azure.com/api/projects/proj-default"
+    AZURE_AI_API_KEY: Optional[str] = None
+    AZURE_AI_DEPLOYMENT: str = "gpt-5-mini"
+    AZURE_AI_SIMULATE: bool = True
 
     # Azure Blob Storage
     AZURE_STORAGE_CONNECTION_STRING: Optional[str] = None

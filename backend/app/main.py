@@ -22,6 +22,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Middleware de Logging para depuración de peticiones
+from fastapi import Request
+import time
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    headers = dict(request.headers)
+    # No imprimir contraseñas sensibles si se loguea todo
+    print(f"\n[BACKEND REQUEST] {request.method} {request.url}")
+    print(f"[BACKEND REQUEST HEADERS] {headers}")
+    
+    response = await call_next(request)
+    
+    process_time = (time.time() - start_time) * 1000
+    print(f"[BACKEND RESPONSE] Status: {response.status_code} | Time: {process_time:.2f}ms\n")
+    return response
+
 # 3. Incluir los enrutadores
 app.include_router(auth.router)
 app.include_router(pantry.router)

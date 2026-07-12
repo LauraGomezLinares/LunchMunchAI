@@ -344,37 +344,30 @@ mockMarkets: Market[]
 
 ---
 
-## 🔌 Integración Backend (Futuro)
+## 🔌 Integración Backend (Realizada)
 
-Todos los servicios están comentados con `TODO` indicando puntos de conexión:
+Todos los servicios y pantallas están conectados a la API REST real de FastAPI:
 
 ### Autenticación
 **Archivo:** `src/services/api/auth.ts`
-```typescript
-// TODO: conectar a FastAPI endpoint /auth/login
-// Actualmente: mock con email demo@lunchmunch.ai, password 123456
-```
+- Conectado a FastAPI endpoints `/auth/login` y `/auth/register`.
+- Flujos de registro de perfil con alergias dinámicas y guardado de sesión seguro con Zustand.
 
 ### Recetas
 **Archivo:** `src/services/api/recipes.ts`
-```typescript
-// TODO: conectar a FastAPI endpoint /recipes/recommend
-// Actualmente: datos mockeados con latencia simulada (500ms)
-```
+- Conectado a FastAPI endpoints `/recipes/recommend` (Motor de Azure OpenAI) y CRUD de favoritos en `/recipes/favorites`.
 
-### Estructura esperada del backend
+### Estructura de Endpoints de Backend
 
 ```
 FastAPI Backend (Puerto 8000)
-├── /auth/login                      # POST: email + password → token
-├── /auth/register                   # POST: crear usuario
-├── /recipes/recommend               # GET: recetas por ingredientes
-├── /recipes/{id}                    # GET: detalle de receta
-├── /pantry/add                      # POST: agregar ingrediente
-├── /pantry/remove                   # DELETE: quitar ingrediente
-├── /markets/nearby                  # GET: mercados cercanos
-├── /user/profile                    # GET/PUT: datos usuario
-└── /user/allergies                  # PUT: actualizar alergias
+├── /auth/login                      # POST: inicio de sesión por email y contraseña
+├── /auth/register                   # POST: registro de perfil con alergias
+├── /pantry                          # GET/POST: gestión asíncrona de ingredientes
+├── /pantry/{id}                     # DELETE: eliminación de ingrediente de despensa
+├── /recipes/recommend               # GET: consulta al agente Chef-LunchMunch de Azure AI
+├── /recipes/favorites               # GET/POST: listado y guardado de favoritos
+└── /recipes/favorites/{id}          # DELETE: remover receta de favoritos
 ```
 
 ---
@@ -389,16 +382,16 @@ FastAPI Backend (Puerto 8000)
 - [x] Datos mockeados
 - [x] Zustand + AsyncStorage
 
-### Fase 2: Backend Integration
-- [ ] Conectar FastAPI
-- [ ] Autenticación real con JWT
-- [ ] Sincronización de pantry en base de datos
-- [ ] Recomendación de recetas con IA
+### Fase 2: Backend Integration (✅ Completado)
+- [x] Conectar FastAPI
+- [x] Autenticación real con JWT (Register / Login)
+- [x] Sincronización de pantry en base de datos local SQLite
+- [x] Recomendación de recetas con IA (Azure OpenAI)
 
-### Fase 3: Funcionalidades Avanzadas
-- [ ] Integración Google Maps API (mercados reales)
-- [ ] Cálculo nutricional automático
-- [ ] Historial de recetas
+### Fase 3: Funcionalidades Avanzadas (En progreso)
+- [ ] Integración Google Maps API (mercados reales) (FEAT-04)
+- [x] Cálculo nutricional automático (FEAT-05)
+- [x] Historial de recetas y Favoritos persistido (FEAT-06)
 - [ ] Exportar lista de compras (PDF/CSV)
 
 ### Fase 4: Optimización

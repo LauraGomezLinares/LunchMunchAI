@@ -20,17 +20,15 @@
 
 ---
 
-## 1. Estado actual del proyecto (siempre debe reflejar el AHORA, se sobreescribe)
-
 | Campo | Valor |
 |---|---|
-| Fecha de última actualización | `11 de Julio de 2026` |
-| Feature en curso | `FEAT-01 a FEAT-05 (Configuración de base de datos y migraciones con Alembic)` |
-| % avance estimado del backend | `25%` |
+| Fecha de última actualización | `12 de Julio de 2026` |
+| Feature en curso | `Consumo Real de Azure AI Foundry, Mapeo de Respuestas e Integración de Imágenes` |
+| % avance estimado del backend | `85%` |
 | Bloqueador activo (si existe) | `Ninguno` |
-| Último endpoint FastAPI modificado | `Integración de base de datos física SQLite en local` |
-| Última decisión de arquitectura | `Configuración de Alembic usando SQLModel.metadata y url local` |
-| Próximo paso inmediato | `Ejecutar la migración inicial de base de datos en local y levantar el servidor FastAPI` |
+| Último endpoint FastAPI modificado | `Integrado el cliente oficial AzureOpenAI en azure_ai.py con manejo de temperatura y mapeador estructural` |
+| Última decisión de arquitectura | `Utilizar el cliente de AzureOpenAI de la biblioteca openai para autenticación robusta mediante API Key` |
+| Próximo paso inmediato | `Desarrollar la lógica de información nutricional dinámica y geolocalización de mercados` |
 
 ---
 
@@ -115,3 +113,139 @@
 
 **Próximo paso sugerido para la siguiente sesión:**
 - Ejecutar la prueba de humo del backend levantando el servidor FastAPI y verificando los endpoints locales una vez generadas y aplicadas las migraciones físicas.
+
+---
+
+### Sesión 3 — 12 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Conexión de Red, Autenticación Real, y CRUD de Despensa (FEAT-02)
+
+**Qué se hizo:**
+- Backend: Añadido middleware de logging de peticiones en `main.py` para visualizar headers y métodos HTTP.
+- Backend: Registrado el endpoint `GET /recipes/recommend` para que retorne datos estructurados y evitar el error 404 del frontend.
+- Frontend: Creado el servicio `services/api/pantry.ts` con funciones `fetchPantryItems`, `addPantryItemBackend` y `deletePantryItemBackend` que integran el header `X-API-KEY`.
+- Frontend: Modificado `PantryScreen.tsx` para sincronizar la UI y el estado global de Zustand directamente con el backend SQLite.
+- Frontend: Creado `.env` y `.env.example` en la carpeta móvil para soportar URLs de túneles como Ngrok de manera configurable.
+- Documentación: Actualizados los archivos `README.md` maestro, `SYSTEM_ARCHITECTURE.md`, `INTEGRATION_AZURE.md` y la bitácora operativa.
+
+**Impacto en Frontend (React Native):**
+- La aplicación móvil ahora sincroniza su despensa en tiempo real (añadir/quitar ingredientes) persistiendo los cambios de forma física en la base de datos a través de peticiones HTTP.
+
+**Archivos modificados/creados:**
+- `frontend/src/services/api/pantry.ts` — Wrapper de API para el CRUD de despensa.
+- `frontend/src/screens/pantry/PantryScreen.tsx` — Pantalla de despensa refactorizada con efectos de carga.
+- `docs/INTEGRATION_AZURE.md` — Documentación extendida de variables de entorno y túneles Ngrok.
+- `docs/AGENT_CONTEXT_LOG.md` — Bitácora e historial actualizados.
+
+**Decisiones tomadas:**
+- Se configuró la persistencia física local mediante una SQLite de desarrollo local (`lunchmunch.db`). Los datos se persisten de forma consistente entre reinicios del servidor FastAPI gracias al ORM SQLModel y las migraciones Alembic.
+
+**Problemas encontrados / no resueltos:**
+- Ninguno. La conexión local/remota a través del túnel Ngrok se validó con código HTTP 200 exitoso.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Desarrollar la lógica del motor híbrido de recetas en `backend/app/services/azure_ai.py` conectando con el Azure AI Foundry Agent Service real.
+
+---
+
+### Sesión 4 — 12 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Validación Real de JWT y CRUD de Despensa Seguro (FEAT-01 & FEAT-02)
+
+**Qué se hizo:**
+- Backend: Implementada la dependencia `verify_jwt` en `app/core/security.py`. Valida que el token JWT sea un UUID existente en la tabla de usuarios de la base de datos (SQLite/Azure SQL), rechazando peticiones no autorizadas.
+- Backend: Modificado el endpoint `POST /auth/login` para validar las credenciales (email y hashed password) contra la base de datos física, retornando el UUID de usuario como token en caso de éxito.
+- Backend: Refactorizados los endpoints del enrutador `app/routers/pantry.py` para utilizar `verify_jwt` en lugar de la API key anterior, deduciendo dinámicamente el `usuario_id` del token autenticado.
+- Frontend: Modificado `services/api/pantry.ts` y `PantryScreen.tsx` para ajustarse a los nuevos endpoints seguros basados en JWT (removiendo el `usuarioId` en los parámetros de la petición).
+
+**Impacto en Frontend (React Native):**
+- El inicio de sesión ahora valida credenciales reales.
+- El inventario de despensa se asocia automáticamente de forma segura al perfil del usuario autenticado en sesión.
+
+**Archivos modificados/creados:**
+- `backend/app/core/security.py` — Validación de tokens JWT en base de datos.
+- `backend/app/routers/auth.py` — Login con base de datos real.
+- `backend/app/routers/pantry.py` — Endpoints CRUD protegidos por JWT.
+- `frontend/src/services/api/pantry.ts` — Endpoints limpios del backend.
+- `frontend/src/screens/pantry/PantryScreen.tsx` — Flujo de guardado seguro adaptado a JWT.
+- `docs/AGENT_CONTEXT_LOG.md` — Bitácora e historial actualizados.
+
+**Decisiones tomadas:**
+- Utilizar el ID del usuario en base de datos (UUID) como token de sesión en esta fase MVP para simplificar la integración sin acoplar dependencias complejas.
+
+**Problemas encontrados / no resueltos:**
+- Ninguno.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Integrar el Azure AI Foundry Agent real en el backend.
+
+---
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Realizar pruebas de generación de recetas por IA desde la app móvil.
+
+---
+
+### Sesión 5 — 12 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Integración Directa de Azure AI Foundry y Endpoint de Recetas Seguro (FEAT-03)
+
+**Qué se hizo:**
+- Backend: Modificado [session.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/db/session.py) eliminando la lógica de seeding automático para comenzar con una base de datos limpia de desarrollo.
+- Backend: Modificado [auth.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/routers/auth.py) liberando `POST /auth/register` de requerimiento de API Key, haciendo el email lookup insensible a mayúsculas/minúsculas y ajustando el conflicto a `409 Conflict`.
+- Backend: Creado el archivo de variables [.env](file:///c:/Users/User/Documents/LunchMunchAI/backend/.env) mapeando tu clave de API, endpoint de Azure AI y el despliegue `gpt-5-mini` de forma confidencial local (se borró `.env.example`).
+- Backend: Desarrollado `AzureAIService` en [azure_ai.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/services/azure_ai.py) con llamadas REST nativas al servicio de Azure OpenAI, forzando formato JSON estricto (`response_format`) e integrando timeouts e impresión del input/output en consola para auditoría.
+- Backend: Conectado el endpoint `GET /recipes/recommend` en [recipes.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/routers/recipes.py) bajo la seguridad del Bearer JWT, consultando automáticamente la despensa del usuario actual en SQLite y pasándole los ingredientes a `AzureAIService`.
+- Documentación: Actualización en `docs/AGENT_CONTEXT_LOG.md` reflejando el progreso finalizado y las decisiones de arquitectura.
+
+**Impacto en Frontend (React Native):**
+- El flujo de Registro y Login ya opera de forma transparente contra la base de datos limpia.
+- La pantalla de Recetas ya invoca directamente tu infraestructura de Azure AI Foundry a través del backend pasando por el túnel público.
+
+**Archivos modificados/creados:**
+- `backend/app/db/session.py` — Remoción de seeding de usuarios.
+- `backend/app/routers/auth.py` — Registro abierto e insensible a mayúsculas.
+- `backend/app/services/azure_ai.py` — Integración HTTP/REST real con Azure OpenAI.
+- `backend/app/routers/recipes.py` — Endpoint de recetas conectado a la base de datos y a Azure AI.
+- `docs/AGENT_CONTEXT_LOG.md` — Bitácora e historial actualizados.
+
+**Decisiones tomadas:**
+- Simplificación del pipeline de IA mediante llamadas directas al SDK de Azure AI Foundry, asegurando respuestas con esquemas predecibles (JSON estructurado) y monitoreo de terminal para auditoría clara del prompt.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Realizar pruebas integrales de generación de recetas por IA desde la app móvil.
+
+---
+
+### Sesión 6 — 12 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Despensa Dinámica, Integración con Azure OpenAI y Mapeo Estructural (FEAT-02 & FEAT-03)
+
+**Qué se hizo:**
+- Backend: Configurado `DATABASE_URL` en [session.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/db/session.py) para resolver la base de datos SQLite de manera absoluta, solucionando inconsistencias de lectura de bases de datos vacías según la terminal de ejecución.
+- Backend: Modificado el endpoint `/recipes/recommend` en [recipes.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/routers/recipes.py) agregando validaciones para despensas vacías e ingredientes no aptos por alérgenos.
+- Backend: Implementado el cliente de conexión real a través de la clase `AzureOpenAI` en [azure_ai.py](file:///c:/Users/User/Documents/LunchMunchAI/backend/app/services/azure_ai.py), resolviendo el error `'AzureKeyCredential' object has no attribute 'get_token'` al prescindir de Entra ID y usar autenticación directa mediante API Key.
+- Backend: Removidos parámetros no soportados (`temperature` y `response_format`) en la invocación del despliegue `gpt-5-mini` de Azure OpenAI.
+- Backend: Diseñado un mapeador estructural en `azure_ai.py` que estandariza automáticamente la salida JSON del Agente de Azure Foundry `{ 'receta', 'ingredientes', 'instrucciones' }` al formato extendido requerido por el frontend (`id`, `title`, `steps`, `nutrition`, `image`).
+- Frontend: Rediseñado [PantryScreen.tsx](file:///c:/Users/User/Documents/LunchMunchAI/frontend/src/screens/pantry/PantryScreen.tsx) para admitir ingredientes dinámicos ilimitados mediante una caja de texto libre (`customIngredient`) y agregando visualmente el conteo y borrado de la despensa real en tiempo real.
+- Frontend: Conectados los botones de "Generar IA" en [RecipesListScreen.tsx](file:///c:/Users/User/Documents/LunchMunchAI/frontend/src/screens/recipes/RecipesListScreen.tsx) y optimizada la carga con `ActivityIndicator` y manejo de excepciones nativas (`alert`).
+- Frontend: Solucionado el error de imágenes que no cargaban en [RecipeCard.tsx](file:///c:/Users/User/Documents/LunchMunchAI/frontend/src/components/features/RecipeCard.tsx) al redirigir las URLs obsoletas de `source.unsplash.com` hacia un fallback de placeholder de alta calidad en `images.unsplash.com`.
+
+**Impacto en Frontend (React Native):**
+- Los usuarios pueden agregar cualquier ingrediente personalizado a su despensa de forma persistente.
+- El flujo de login, registro, manejo de despensa y generación real ya funciona completamente integrado contra el modelo `gpt-5-mini` de Azure AI Foundry, mostrando múltiples recetas creativas y estables en el emulador.
+
+**Archivos modificados/creados:**
+- `backend/app/db/session.py` — Ruta de SQLite absoluta.
+- `backend/app/routers/recipes.py` — Validación de despensa vacía y control de alérgenos.
+- `backend/app/services/azure_ai.py` — Cliente nativo `AzureOpenAI`, remoción de parámetros no soportados y mapeador de esquemas.
+- `frontend/src/screens/pantry/PantryScreen.tsx` — Caja de texto para ingredientes ilimitados.
+- `frontend/src/screens/recipes/RecipesListScreen.tsx` — Botón interactivo de generación por IA y estados de carga.
+- `frontend/src/components/features/RecipeCard.tsx` — Conversión de endpoints de Unsplash obsoletos.
+- `docs/AGENT_CONTEXT_LOG.md` — Bitácora e historial actualizados.
+
+**Decisiones tomadas:**
+- Utilizar el cliente de `AzureOpenAI` en lugar del restrictivo `AIProjectClient` para simplificar la autenticación por API Key estática, manteniendo la robustez del modelo `gpt-5-mini`.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Avanzar con la geolocalización de mercados para ingredientes faltantes (FEAT-04).

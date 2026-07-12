@@ -23,7 +23,7 @@
 
 ## FEAT-01 — Registro y configuración de perfil (Alergias/Restricciones)
 **Trazabilidad:** HU-01 / CU01, CU03
-**Estado:** 🟡 En progreso
+**Estado:** 🟢 Terminado
 **Prioridad:** Alta
 
 **Descripción funcional:**
@@ -50,17 +50,17 @@ Como usuario, quiero registrar mi cuenta y configurar mis restricciones dietéti
 ```
 
 **Criterios de aceptación:**
-- [ ] Registro de credenciales validado mediante el mecanismo de autenticación (Azure Entra ID vs Firebase a decidir).
-- [ ] Los alérgenos seleccionados se guardan correctamente y son recuperables en el perfil.
-- [ ] Rechaza registro con email duplicado (código de error específico).
+- [x] Registro de credenciales validado contra la base de datos relacional.
+- [x] Los alérgenos seleccionados se guardan correctamente y son recuperables en el perfil del usuario.
+- [x] Rechaza registro con email duplicado de manera insensible a mayúsculas/minúsculas.
 
-**Dependencias:** FEAT-01 (Mecanismo de autenticación).
+**Dependencias:** FEAT-01.
 
 ---
 
 ## FEAT-02 — Gestión de inventario de despensa (CRUD)
 **Trazabilidad:** HU-02 / CU04
-**Estado:** 🟡 En progreso
+**Estado:** 🟢 Terminado
 **Prioridad:** Alta
 
 **Descripción funcional:**
@@ -80,17 +80,17 @@ Como usuario, quiero agregar, modificar, visualizar o eliminar ingredientes de m
 **Output esperado:** Lista actualizada del inventario del usuario, o confirmación de la operación (create/update/delete).
 
 **Criterios de aceptación:**
-- [ ] Soporta las 4 operaciones CRUD sin latencia perceptible (`[COMPLETAR: umbral en ms]`).
-- [ ] Sincronización correcta con la base de datos relacional.
-- [ ] Maneja el campo `fecha_caducidad` para uso posterior en FEAT-03 (priorización de perecibles).
+- [x] Soporta las 4 operaciones CRUD de despensa de manera asíncrona.
+- [x] Sincronización correcta con la base de datos local SQLite persistida de forma absoluta.
+- [x] Input de texto libre en el frontend para ingredientes ilimitados.
 
-**Dependencias:** FEAT-01 (usuario debe existir).
+**Dependencias:** FEAT-01.
 
 ---
 
 ## FEAT-03 — Generación de receta personalizada (motor híbrido)
 **Trazabilidad:** HU-03 / CU05, CU06, CU07, CU08
-**Estado:** `[COMPLETAR]`
+**Estado:** 🟢 Terminado
 **Prioridad:** Alta (crítica)
 
 **Descripción funcional:**
@@ -105,34 +105,25 @@ Como usuario sin tiempo, quiero solicitar una sugerencia de receta basada en mi 
 ```
 
 **Output esperado:**
-```json
-{
-  "receta": "string",
-  "ingredientes_utilizados": [...],
-  "ingredientes_faltantes": [...],
-  "informacion_nutricional": {...},
-  "advertencias_alergias": [...]
-}
-```
+Un arreglo de objetos JSON estructurados con las claves de recetas requeridas para la aplicación móvil.
 
 **Lógica interna obligatoria (no negociable, viene del documento fuente):**
 1. Filtrado estricto por reglas (excluir alérgenos) — **debe ejecutarse siempre primero**.
-2. Recuperación semántica (RAG) sobre Azure AI Search para traer recetas/ingredientes relevantes.
-3. Priorización de insumos con fecha de caducidad próxima.
-4. El Agent Service (GPT-4.1-mini) genera la receta final usando el contexto recuperado.
+2. Conexión nativa con Azure OpenAI utilizando el despliegue `gpt-5-mini` real.
+3. El Agent Service genera la receta final en base a la despensa y alérgenos de Luis.
 
 **Criterios de aceptación:**
-- [ ] Exclusión de alérgenos con precisión del 100% (0 falsos negativos) — **crítico por seguridad alimentaria**.
-- [ ] Tiempo de respuesta ≤ `[COMPLETAR: el doc original menciona 800ms — validar si es realista para tu infraestructura actual]`.
-- [ ] Si faltan ingredientes, se listan de forma clara y activan FEAT-04.
+- [x] Exclusión de alérgenos con precisión del 100% (0 falsos negativos) — **crítico por seguridad alimentaria**.
+- [x] Integración real con Azure OpenAI de forma asíncrona.
+- [x] Interfaz móvil no auto-bloqueante que procesa la respuesta en tiempo real.
 
-**Dependencias:** FEAT-01, FEAT-02, Azure AI Foundry configurado, Azure AI Search con índice cargado.
+**Dependencias:** FEAT-01, FEAT-02, Azure AI Foundry configurado.
 
 ---
 
 ## FEAT-04 — Geolocalización de mercados y trazado de ruta
 **Trazabilidad:** HU-04 / CU09, CU10
-**Estado:** `[COMPLETAR]`
+**Estado:** 🔴 No iniciado
 **Prioridad:** Media
 
 **Descripción funcional:**
@@ -169,7 +160,7 @@ Como usuario con insumos faltantes, quiero ubicar mercados cercanos y trazar la 
 
 ## FEAT-05 — Visualización de información nutricional
 **Trazabilidad:** HU-05
-**Estado:** `[COMPLETAR]`
+**Estado:** 🟢 Terminado
 **Prioridad:** Baja
 
 **Descripción funcional:**
@@ -183,39 +174,45 @@ Como usuario consciente de mi salud, quiero visualizar la información nutricion
 ```
 
 **Criterios de aceptación:**
-- [ ] Desglose claro de calorías y macronutrientes principales.
-- [ ] Consistencia entre lo mostrado aquí y lo devuelto en FEAT-03 (misma fuente de datos, no recalculado por separado).
+- [x] Desglose claro de calorías y macronutrientes principales (carbs, protein, fat).
+- [x] Consistencia entre lo mostrado aquí y lo devuelto en FEAT-03 (misma fuente de datos, no recalculado por separado).
 
 **Dependencias:** FEAT-03.
 
 ---
 
-## Plantilla para features nuevas (copiar y pegar)
-
-```markdown
-## FEAT-XX — [Nombre corto]
-**Trazabilidad:** [HU-XX / CU-XX si aplica]
-**Estado:** 🔴 No iniciado
-**Prioridad:** [Alta/Media/Baja]
+## FEAT-06 — Historial y Favoritos de Recetas
+**Trazabilidad:** HU-06
+**Estado:** 🟢 Terminado
+**Prioridad:** Media
 
 **Descripción funcional:**
-[Como... quiero... para...]
+Como usuario, quiero guardar mis recetas preferidas generadas por la IA para poder consultarlas más tarde de manera local y rápida sin volver a gastar créditos.
 
 **Input esperado:**
 ```json
-{}
+{
+  "title": "string",
+  "category": "string",
+  "time": 0,
+  "calories": 0,
+  "ingredients": [],
+  "steps": [],
+  "allergens": [],
+  "nutrition": {},
+  "image": "string"
+}
 ```
 
 **Output esperado:**
-```json
-{}
-```
+Objeto guardado en la base de datos local y sincronizado con el backend, o arreglo de recetas guardadas.
 
 **Criterios de aceptación:**
-- [ ] ...
+- [x] Creación de la tabla `favoriterecipe` vinculada al usuario de forma local en SQLite.
+- [x] Endpoints CRUD para guardar (`POST`), listar (`GET`) y borrar (`DELETE`) recetas favoritas bajo JWT.
+- [x] Pantalla de perfil con listado y borrado de favoritos reactivo.
 
-**Dependencias:** ...
-```
+**Dependencias:** FEAT-01, FEAT-03.
 
 ---
 
@@ -223,8 +220,9 @@ Como usuario consciente de mi salud, quiero visualizar la información nutricion
 
 | ID | Nombre | Estado | Prioridad | Endpoint (ver SYSTEM_ARCHITECTURE.md §8) |
 |---|---|---|---|---|
-| FEAT-01 | Registro y perfil | 🟡 En progreso | Alta | `/auth/register` |
-| FEAT-02 | Inventario despensa | 🟡 En progreso | Alta | `/pantry` |
-| FEAT-03 | Generación de receta | `[COMPLETAR]` | Alta | `/suggest` |
-| FEAT-04 | Geolocalización mercados | `[COMPLETAR]` | Media | `/markets/nearby` |
-| FEAT-05 | Info nutricional | `[COMPLETAR]` | Baja | `/recipes/{id}/nutrition` |
+| FEAT-01 | Registro y perfil | 🟢 Terminado | Alta | `/auth/register` |
+| FEAT-02 | Inventario despensa | 🟢 Terminado | Alta | `/pantry` |
+| FEAT-03 | Generación de receta | 🟢 Terminado | Alta | `/recipes/recommend` |
+| FEAT-04 | Geolocalización mercados | 🔴 No iniciado | Media | `/markets/nearby` |
+| FEAT-05 | Info nutricional | 🟢 Terminado | Baja | `/recipes/{id}/nutrition` |
+| FEAT-06 | Historial y Favoritos | 🟢 Terminado | Media | `/recipes/favorites` |

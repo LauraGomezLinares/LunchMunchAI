@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from sqlmodel import SQLModel
 # Import all models to ensure they are registered with SQLModel.metadata
-from app.models import User, PantryItem
+from app.models import User, PantryItem, FavoriteRecipe
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

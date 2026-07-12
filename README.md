@@ -1,124 +1,120 @@
-# LunchMunchAI - Backend Service
+# LunchMunchAI 🥗
 
-Este es el servicio backend para **LunchMunchAI**, desarrollado utilizando **FastAPI** y estructurado con un enfoque asíncrono para orquestar la comunicación entre el aplicativo móvil (React Native), el motor de inteligencia artificial (Azure AI Foundry y Azure AI Search), y los servicios de base de datos y geolocalización.
+LunchMunchAI es un asistente inteligente diseñado para optimizar la preparación de alimentos cotidianos. Utilizando una arquitectura híbrida y moderna, permite a los usuarios gestionar su despensa digital, registrar restricciones alimenticias y alergias, y generar recetas personalizadas optimizando insumos perecibles mediante Inteligencia Artificial (Azure AI Foundry y Azure AI Search).
+
+Este repositorio consolidado contiene tanto la aplicación móvil (**Frontend**) como el servicio de orquestación y base de datos (**Backend**).
 
 ---
 
-## 🚀 Requisitos Previos
+## 📂 Estructura General del Proyecto
 
-Asegúrate de tener instalado en tu sistema:
+```text
+/LunchMunchAI
+├── /frontend      # Aplicación móvil en React Native (Expo + TypeScript)
+├── /backend       # API REST asíncrona en FastAPI (Python + SQLModel)
+├── /docs          # Especificaciones técnicas detalladas y bitácoras del proyecto
+└── README.md      # Este archivo (Guía de entrada general)
+```
+
+---
+
+## 💻 1. Frontend (React Native & Expo)
+
+La interfaz móvil está construida con **React Native** usando **Expo**, estructurada con TypeScript, navegación por pestañas (`@react-navigation`), y gestión de estado con **Zustand**.
+
+### Requisitos Previos (Frontend)
+- **Node.js** (Versión 18 o superior recomendada)
+- **npm** o **yarn**
+- **Expo Go** instalado en tu dispositivo móvil (Android/iOS) para pruebas en vivo, o simuladores locales de Android/iOS.
+
+### Configuración e Inicio Rápido (Frontend)
+1. Navega a la carpeta frontend:
+   ```bash
+   cd frontend
+   ```
+2. Instala las dependencias de Node:
+   ```bash
+   npm install
+   ```
+3. Inicia el servidor de desarrollo de Expo:
+   ```bash
+   npm run start
+   ```
+4. Escanea el código QR generado desde la app **Expo Go** en tu celular para ver e interactuar con la aplicación.
+
+---
+
+## ⚙️ 2. Backend (FastAPI & SQLModel)
+
+El backend es una API asíncrona construida en **FastAPI** con **SQLModel** (ORM unificado con Pydantic) y control de versiones de base de datos relacional mediante **Alembic**.
+
+### Requisitos Previos (Backend)
 - **Python 3.11** o superior.
-- **Git** para el control de versiones.
+- Entorno de terminal compatible (PowerShell, CMD, Bash).
+
+### Configuración e Inicio Rápido (Backend)
+1. Navega a la carpeta backend:
+   ```bash
+   cd backend
+   ```
+2. Crea el entorno virtual (`.venv`):
+   ```bash
+   python -m venv .venv
+   ```
+3. Activa el entorno virtual:
+   - **En Windows (PowerShell):**
+     ```powershell
+     .venv\Scripts\Activate.ps1
+     ```
+   - **En Windows (CMD):**
+     ```cmd
+     .venv\Scripts\activate.bat
+     ```
+   - **En macOS / Linux:**
+     ```bash
+     source .venv/bin/activate
+     ```
+4. Instala las dependencias requeridas:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Configura las variables de entorno:
+   - Copia el archivo `.env.example` y renómbralo a `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Edita el archivo `.env` configurando tu clave secreta de API (`AZURE_AGENT_API_KEY`), credenciales de Azure AI y Google Maps.
+6. Aplica las migraciones de base de datos para generar tu SQLite local (`lunchmunch.db`):
+   ```bash
+   alembic upgrade head
+   ```
+7. Inicia el servidor local de desarrollo:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+El servidor backend estará disponible en: [http://localhost:8000](http://localhost:8000)
+- **Documentación Swagger Interactiva:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-## 🛠️ Configuración e Instalación Paso a Paso
+## 🛠️ Desarrollo Colaborativo y Git
 
-Sigue estos pasos en tu terminal para preparar el entorno virtual e instalar las librerías necesarias:
-
-### 1. Clonar y posicionarse en la rama de desarrollo
-```bash
-git checkout backend-luis
-```
-
-### 2. Crear el entorno virtual (`.venv`)
-Dentro de la carpeta raíz del proyecto, ejecuta el siguiente comando:
-```bash
-python -m venv .venv
-```
-
-### 3. Activar el entorno virtual
-- **En Windows (PowerShell):**
-  ```powershell
-  .venv\Scripts\Activate.ps1
-  ```
-- **En Windows (CMD):**
-  ```cmd
-  .venv\Scripts\activate.bat
-  ```
-- **En macOS / Linux:**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-### 4. Instalar Dependencias
-Una vez activado el entorno virtual, instala las dependencias necesarias:
-```bash
-pip install -r backend/requirements.txt
-```
-
-### 5. Configurar Variables de Entorno
-Copia el archivo de plantilla `.env.example` y renómbralo a `.env`:
-```bash
-cp backend/.env.example backend/.env
-```
-*Edita el archivo `backend/.env` con tus credenciales locales de Azure, API keys de Google Maps, etc.*
-
-### 6. Ejecutar las Migraciones de la Base de Datos (Alembic)
-Con el entorno virtual activado, ve al directorio `backend/` y aplica las migraciones existentes para generar la base de datos local SQLite (o actualizar el motor de base de datos correspondiente):
-```bash
-cd backend
-alembic upgrade head
-```
-*(Para generar nuevas migraciones tras modificar los modelos en `app/models/`, utiliza `alembic revision --autogenerate -m "Descripción del cambio"`)*
+Cuando trabajes en tu rama local (por ejemplo, `backend-luis`) y vayas a subir cambios:
+1. Comprueba los archivos modificados: `git status`
+2. Prepáralos: `git add .`
+3. Haz el commit asociando el código de la especificación técnica (ej. `FEAT-01`):
+   ```bash
+   git commit -m "FEAT-01: Implementar endpoints de autenticación y migraciones"
+   ```
+4. Sube la rama remota: `git push origin backend-luis`
 
 ---
 
-## 🏃 Ejecución del Servidor de Desarrollo
+## 📖 Documentación de Arquitectura e Integración
 
-Para iniciar el servidor local de desarrollo con recarga automática, ejecuta:
-
-```bash
-cd backend
-uvicorn app.main:app --reload
-```
-
-El servidor estará disponible en: [http://localhost:8000](http://localhost:8000)
-
-### 📖 Documentación Interactiva de la API
-FastAPI genera documentación automática de forma nativa. Puedes acceder a ella a través de:
-- **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs) (Permite probar los endpoints en vivo)
-- **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
-
----
-
-## 📂 Estructura del Backend
-- `/backend/app/main.py`: Punto de entrada de la aplicación.
-- `/backend/app/core/config.py`: Validación de variables de entorno mediante `pydantic-settings`.
-- `/backend/app/db/session.py`: Configuración de sesiones asíncronas para Azure SQL/SQLite.
-- `/backend/app/models/`: Modelos de datos y esquemas de base de datos.
-- `/backend/app/routers/`: Enrutadores independientes de la API (`auth`, `pantry`, `recipes`, `markets`).
-- `/backend/app/services/`: Clientes de comunicación externa (Azure AI, Google Maps, Image Compression).
-
----
-
-## 🌐 Manual Corto de Git para Subir Cambios
-
-Cuando completes tus modificaciones en tu entorno local y desees enviarlas a GitHub bajo tu rama de trabajo `backend-luis`, sigue estos comandos:
-
-### 1. Verificar archivos modificados y nuevos
-```bash
-git status
-```
-
-### 2. Agregar los cambios al área de preparación (Staging)
-Para agregar archivos específicos:
-```bash
-git add backend/app/routers/auth.py
-```
-O para agregar todos los cambios y archivos nuevos:
-```bash
-git add .
-```
-
-### 3. Crear el Commit con un mensaje descriptivo
-*(Recuerda referenciar el ID de la feature bajo la cual estás trabajando en la descripción del commit)*
-```bash
-git commit -m "FEAT-01: Implementar base de routers y configuración del backend"
-```
-
-### 4. Enviar los cambios a tu rama en el repositorio remoto
-```bash
-git push origin backend-luis
-```
-*(Si es la primera vez que subes la rama, usa `git push -u origin backend-luis`)*
+Para mayor detalle de especificaciones técnicas y flujos, consulta la carpeta `/docs`:
+- [SYSTEM_ARCHITECTURE.md](file:///c:/Users/User/Documents/LunchMunchAI/docs/SYSTEM_ARCHITECTURE.md) - Arquitectura global del sistema y stack tecnológico.
+- [SPEC_FEATURES.md](file:///c:/Users/User/Documents/LunchMunchAI/docs/SPEC_FEATURES.md) - Matriz de especificaciones funcionales y criterios de aceptación (SDD).
+- [INTEGRATION_AZURE.md](file:///c:/Users/User/Documents/LunchMunchAI/docs/INTEGRATION_AZURE.md) - Contrato de endpoints y seguridad API Key para el Agente Externo de Azure AI.
+- [AGENT_CONTEXT_LOG.md](file:///c:/Users/User/Documents/LunchMunchAI/docs/AGENT_CONTEXT_LOG.md) - Bitácora histórica del desarrollo y estado del proyecto.

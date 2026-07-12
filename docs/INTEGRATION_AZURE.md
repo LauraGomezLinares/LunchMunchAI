@@ -4,6 +4,36 @@ Este documento detalla la estructura de comunicación, autenticación y los esqu
 
 ---
 
+## 📱 Configuración del Entorno Móvil (Frontend)
+
+Para conectar el aplicativo React Native (Expo) con el Backend local desde emuladores o dispositivos físicos, tenemos dos opciones:
+
+### Opción A: Dirección IP Local (Requiere que estén en la misma red Wi-Fi y sin restricciones de Firewall)
+1. Crea un archivo `.env` en la raíz de la carpeta `frontend/` (basado en `frontend/.env.example`).
+2. Configura la dirección IP local de tu máquina ejecutando `ipconfig` en Windows (`ifconfig` en Linux/macOS) en la variable `EXPO_PUBLIC_API_URL`.
+   ```env
+   EXPO_PUBLIC_API_URL=http://<TU_IP_LOCAL>:8000
+   ```
+3. Reinicia el empaquetador de Expo con la caché limpia (`npx expo start -c`) para que se cargue la nueva configuración.
+
+### Opción B: Túnel Público con Ngrok (Recomendado - Salta restricciones de red y firewalls)
+1. Descarga e instala [Ngrok](https://ngrok.com/).
+2. Con tu backend corriendo en el puerto 8000, abre otra terminal y ejecuta el comando para levantar el túnel:
+   ```bash
+   ngrok http 8000
+   ```
+3. Copia la URL pública HTTPS que genera Ngrok (ej: `https://xxxx-xxxx-xxxx.ngrok-free.app`).
+4. En el archivo `frontend/.env`, configura la variable apuntando a esa URL pública:
+   ```env
+   EXPO_PUBLIC_API_URL=https://xxxx-xxxx-xxxx.ngrok-free.app
+   ```
+5. Reinicia el empaquetador de Expo con caché limpia:
+   ```bash
+   npx expo start -c
+   ```
+
+---
+
 ## 🔒 Autenticación Básica (API Key)
 
 Para asegurar las peticiones entrantes desde Azure sin la complejidad de OAuth en la fase de MVP, se implementa un header de seguridad:
