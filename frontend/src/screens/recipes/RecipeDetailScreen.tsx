@@ -5,14 +5,17 @@ import Button from '../../components/ui/Button';
 import { COLORS } from '../../constants/colors';
 import { TYPOGRAPHY } from '../../constants/typography';
 
-import { Alert } from 'react-native';
+import { Alert, Image } from 'react-native';
 import { addFavoriteRecipeBackend } from '../../services/api/recipes';
+import { getRecipeImage } from '../../components/features/RecipeImageHelper';
 
 export default function RecipeDetailScreen({ route }: any) {
   const recipe = route.params?.recipe;
   const [saving, setSaving] = React.useState(false);
 
   if (!recipe) return null;
+
+  const imageSource = getRecipeImage(recipe.category, recipe.image);
 
   const handleSaveFavorite = async () => {
     setSaving(true);
@@ -39,6 +42,7 @@ export default function RecipeDetailScreen({ route }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        <Image source={imageSource} style={styles.detailImage} />
         <Text style={styles.title}>{recipe.title}</Text>
         <Text style={styles.meta}>{recipe.category} • {recipe.time} min • {recipe.calories} kcal</Text>
         
@@ -66,6 +70,7 @@ export default function RecipeDetailScreen({ route }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { padding: 16 },
+  detailImage: { width: '100%', height: 200, borderRadius: 16, marginBottom: 16 },
   title: { ...TYPOGRAPHY.title, color: COLORS.textPrimary },
   meta: { ...TYPOGRAPHY.body, color: COLORS.textSecondary, marginTop: 8, marginBottom: 12 },
   sectionTitle: { ...TYPOGRAPHY.subtitle, color: COLORS.textPrimary, marginTop: 12, marginBottom: 8 },

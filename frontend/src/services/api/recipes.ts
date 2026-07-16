@@ -5,6 +5,10 @@ export const getRecipes = async () => {
   const token = useAppStore.getState().token;
   console.log(`[API Request] GET ${BASE_URL}/recipes/recommend | Token: ${token ? 'Present' : 'None'}`);
 
+  // Creamos un controlador de aborto para poder definir un tiempo de espera más amplio (60 segundos)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
   try {
     const response = await fetch(`${BASE_URL}/recipes/recommend`, {
       method: 'GET',
@@ -12,7 +16,10 @@ export const getRecipes = async () => {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     console.log(`[API Response] GET ${BASE_URL}/recipes/recommend | Status: ${response.status}`);
 
@@ -24,6 +31,11 @@ export const getRecipes = async () => {
     console.log(`[API Response Data]`, data);
     return data;
   } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      console.error(`[API Error] GET ${BASE_URL}/recipes/recommend | La petición superó el tiempo de espera de 60s.`);
+      throw new Error('El servidor de Inteligencia Artificial está demorando en responder. Inténtalo de nuevo.');
+    }
     console.error(`[API Error] GET ${BASE_URL}/recipes/recommend | Error:`, error.message);
     throw error;
   }
