@@ -42,6 +42,7 @@ export type AppState = {
   onboardingComplete: boolean;
   user: UserProfile | null;
   pantry: Ingredient[];
+  favorites: any[];
   token: string | null;
   isHydrated: boolean;
 };

@@ -98,6 +98,28 @@ El servidor backend estará disponible en: [http://localhost:8000](http://localh
 
 ---
 
+## ⚡ Optimización del Rendimiento y Desarrollo Local
+
+El sistema incorpora técnicas avanzadas para minimizar los tiempos de carga y mejorar la experiencia de usuario:
+
+### 1. Estrategia de Caché Local y SWR (State-While-Revalidate)
+* Los favoritos se almacenan en el estado global persistente de **Zustand** (`useAppStore`), persistido localmente en el dispositivo mediante `AsyncStorage`.
+* Al entrar al perfil, los datos cacheados se muestran de manera instantánea (0ms percibidos). Al mismo tiempo, se inicia una consulta de red en segundo plano para refrescar la lista silenciosamente.
+
+### 2. Actualizaciones Optimistas (Optimistic Updates)
+* **Eliminación instantánea:** Al remover una receta favorita, la UI se actualiza inmediatamente (0ms) sin esperar a que el servidor ngrok responda. Si la llamada de red falla por conectividad, los datos locales se restauran y se le notifica al usuario.
+* **Sincronización al guardar:** Al guardar una receta en favoritos desde la pantalla de detalle, esta se añade directamente a la caché en memoria de Zustand, permitiendo que esté disponible en la pantalla de Perfil antes de que se inicie cualquier sincronización por red.
+
+### 3. Bypass de ngrok (Desarrollo Ultrarrápido)
+* Si estás depurando en un emulador local o dispositivo físico conectado a la misma red Wi-Fi, evita usar ngrok. Ngrok añade un túnel sobre internet que incrementa la latencia en 200ms - 1s+.
+* En su lugar, edita el archivo `frontend/.env` e introduce tu IP local en lugar del túnel:
+  ```env
+  EXPO_PUBLIC_API_URL=http://<TU_IP_LOCAL>:8000
+  ```
+  *(Ejemplo: `http://192.168.18.177:8000`)*. Esto reduce la latencia de red de ~1000ms a menos de **10ms** por petición.
+
+---
+
 ## 🛠️ Desarrollo Colaborativo y Git
 
 Cuando trabajes en tu rama local (por ejemplo, `backend-luis`) y vayas a subir cambios:

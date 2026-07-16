@@ -6,13 +6,14 @@ import { COLORS } from '../../constants/colors';
 import { TYPOGRAPHY } from '../../constants/typography';
 import { useAppStore } from '../../store/useAppStore';
 
-import { FlatList, TouchableOpacity, Alert } from 'react-native';
+import { FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { fetchFavoriteRecipesBackend, deleteFavoriteRecipeBackend } from '../../services/api/recipes';
 
 export default function ProfileScreen({ navigation }: any) {
   const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
-  const [favorites, setFavorites] = React.useState<any[]>([]);
+  const favorites = useAppStore((state) => state.favorites) || [];
+  const setFavorites = useAppStore((state) => state.setFavorites);
   const [loading, setLoading] = React.useState(false);
 
   const loadFavorites = async () => {
@@ -28,8 +29,7 @@ export default function ProfileScreen({ navigation }: any) {
   };
 
   React.useEffect(() => {
-    loadFavorites();
-    // Recargar favoritos cuando la pantalla toma foco
+    // Recargar favoritos únicamente cuando la pantalla tome foco (evita doble petición al montar)
     const unsubscribe = navigation.addListener('focus', () => {
       loadFavorites();
     });
@@ -37,12 +37,18 @@ export default function ProfileScreen({ navigation }: any) {
   }, [navigation]);
 
   const handleDeleteFavorite = async (recipeId: string) => {
+    const previousFavorites = [...favorites];
+    
+    // Actualización optimista: quitamos el favorito localmente para respuesta instantánea (0ms)
+    setFavorites(favorites.filter((item: any) => item.id !== recipeId));
+    
     try {
       await deleteFavoriteRecipeBackend(recipeId);
-      setFavorites((prev) => prev.filter((item) => item.id !== recipeId));
       Alert.alert('Eliminado', 'Receta removida de tus favoritos.');
     } catch (error) {
-      Alert.alert('Error', 'No se pudo eliminar la receta.');
+      // Si el borrado falla en la API, restauramos el estado anterior
+      setFavorites(previousFavorites);
+      Alert.alert('Error', 'No se pudo eliminar la receta del servidor.');
     }
   };
 
@@ -55,23 +61,27 @@ export default function ProfileScreen({ navigation }: any) {
         <Text style={styles.label}>Alergias: {user?.allergies.join(', ') || 'Ninguna'}</Text>
         
         <Text style={styles.subtitle}>Mis Recetas Guardadas ({favorites.length})</Text>
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.favRow}>
-              <TouchableOpacity 
-                style={{ flex: 1 }}
-                onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
-              >
-                <Text style={styles.favTitle}>{item.title}</Text>
-                <Text style={styles.favMeta}>{item.category} • {item.time} min</Text>
-              </TouchableOpacity>
-              <Text style={styles.deleteLink} onPress={() => handleDeleteFavorite(item.id)}>Eliminar</Text>
-            </View>
-          )}
-          style={{ marginTop: 12, maxHeight: 300 }}
-        />
+        {loading && favorites.length === 0 ? (
+          <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 24 }} />
+        ) : (
+          <FlatList
+            data={favorites}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={styles.favRow}>
+                <TouchableOpacity 
+                  style={{ flex: 1 }}
+                  onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
+                >
+                  <Text style={styles.favTitle}>{item.title}</Text>
+                  <Text style={styles.favMeta}>{item.category} • {item.time} min</Text>
+                </TouchableOpacity>
+                <Text style={styles.deleteLink} onPress={() => handleDeleteFavorite(item.id)}>Eliminar</Text>
+              </View>
+            )}
+            style={{ marginTop: 12, maxHeight: 300 }}
+          />
+        )}
 
         <Button title="Cerrar sesión" onPress={() => { logout(); }} style={styles.button} />
       </View>
