@@ -22,13 +22,13 @@
 
 | Campo | Valor |
 |---|---|
-| Fecha de última actualización | `12 de Julio de 2026` |
-| Feature en curso | `Consumo Real de Azure AI Foundry, Mapeo de Respuestas e Integración de Imágenes` |
-| % avance estimado del backend | `85%` |
+| Fecha de última actualización | `16 de Julio de 2026` |
+| Feature en curso | `Optimización de Favoritos y Rendimiento de Base de Datos / UI` |
+| % avance estimado del backend | `90%` |
 | Bloqueador activo (si existe) | `Ninguno` |
-| Último endpoint FastAPI modificado | `Integrado el cliente oficial AzureOpenAI en azure_ai.py con manejo de temperatura y mapeador estructural` |
-| Última decisión de arquitectura | `Utilizar el cliente de AzureOpenAI de la biblioteca openai para autenticación robusta mediante API Key` |
-| Próximo paso inmediato | `Desarrollar la lógica de información nutricional dinámica y geolocalización de mercados` |
+| Último endpoint FastAPI modificado | `Optimización de relaciones lazy en el modelo User (lazy="select")` |
+| Última decisión de arquitectura | `Uso de Zustand Store y Actualizaciones Optimistas en Frontend + Lazy Loading en Backend` |
+| Próximo paso inmediato | `Avanzar con la geolocalización de mercados para ingredientes faltantes (FEAT-04)` |
 
 ---
 
@@ -249,3 +249,37 @@
 
 **Próximo paso sugerido para la siguiente sesión:**
 - Avanzar con la geolocalización de mercados para ingredientes faltantes (FEAT-04).
+
+---
+
+### Sesión 7 — 16 de Julio de 2026
+**Agente/modelo usado:** Antigravity (Gemini 3.5 Flash)
+**Feature(s) trabajada(s):** Optimización de Carga y Rendimiento (Favoritos, Caché Local, Lazy Loading y Actualizaciones Optimistas)
+
+**Qué se hizo:**
+- **Frontend**: Integrado un sistema de caché persistente para favoritos usando el store global de **Zustand** (`useAppStore.ts`), guardando y sincronizando con `AsyncStorage`.
+- **Frontend**: Resuelto el error de doble petición concurrente en `ProfileScreen.tsx` removiendo la llamada en el montaje y manteniéndola solo bajo el listener `'focus'` de React Navigation.
+- **Frontend**: Añadido indicador de carga nativo (`ActivityIndicator`) en `ProfileScreen.tsx` que se muestra únicamente cuando no existen recetas favoritas precargadas en memoria y el backend está procesando.
+- **Frontend**: Implementada **Actualización Optimista** en `ProfileScreen.tsx` al borrar favoritos (se eliminan instantáneamente de la UI en 0ms y se revierte solo si falla la llamada HTTP).
+- **Frontend**: Implementada **Sincronización Inmediata** al agregar favoritos en `RecipeDetailScreen.tsx` que actualiza el store de Zustand al instante para reflejar el cambio tan pronto el usuario vuelve al perfil.
+- **Backend**: Optimizado el rendimiento de base de datos modificando las relaciones `pantry_items` y `favorite_recipes` del modelo `User` en `backend/app/models/user.py` para usar carga perezosa (`lazy="select"`), evitando consultas SQL redundantes durante la validación JWT (`verify_jwt`).
+- **Documentación**: Actualizados los archivos `README.md` y `docs/AGENT_CONTEXT_LOG.md` reflejando las técnicas de optimización, mejoras de desarrollo local bypassando ngrok y detalles de estado.
+
+**Impacto en Frontend (React Native):**
+- La carga y navegación de favoritos en la pestaña Perfil ahora se percibe instantánea (0ms) al consumir los datos cacheados localmente.
+- Los botones de añadir y eliminar favoritos reaccionan de manera fluida e inmediata sin latencias de red perceptibles.
+
+**Archivos modificados/creados:**
+- `frontend/src/types/index.ts` — Agregado tipo `favorites` al estado.
+- `frontend/src/store/useAppStore.ts` — Acciones locales de favoritos y configuración de persistencia.
+- `frontend/src/screens/profile/ProfileScreen.tsx` — Eliminada llamada doble, agregado spinner y eliminación optimista.
+- `frontend/src/screens/recipes/RecipeDetailScreen.tsx` — Añadido guardado local directo al store de Zustand.
+- `backend/app/models/user.py` — Cambio a lazy loading (`"lazy": "select"`) en relaciones.
+- `README.md` — Agregada sección de optimización y bypass de ngrok.
+- `docs/AGENT_CONTEXT_LOG.md` — Bitácora e historial actualizados.
+
+**Decisiones tomadas:**
+- Utilizar actualizaciones optimistas locales combinadas con la persistencia en Zustand para enmascarar por completo la latencia inherente de los túneles ngrok en desarrollo y mejorar drásticamente la calidad visual percibida.
+
+**Próximo paso sugerido para la siguiente sesión:**
+- Continuar con la geolocalización de mercados locales (FEAT-04).

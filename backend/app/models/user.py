@@ -18,13 +18,13 @@ class User(UserBase, table=True):
     # Relación uno-a-muchos con ingredientes de despensa
     pantry_items: List["PantryItem"] = Relationship(
         back_populates="usuario",
-        sa_relationship_kwargs={"lazy": "selectin"}
+        sa_relationship_kwargs={"lazy": "select"}
     )
 
     # Relación uno-a-muchos con recetas favoritas
     favorite_recipes: List["FavoriteRecipe"] = Relationship(
         back_populates="usuario",
-        sa_relationship_kwargs={"lazy": "selectin", "cascade": "all, delete-orphan"}
+        sa_relationship_kwargs={"lazy": "select", "cascade": "all, delete-orphan"}
     )
 
 class UserCreate(UserBase):

@@ -8,6 +8,7 @@ import { TYPOGRAPHY } from '../../constants/typography';
 import { Alert, Image } from 'react-native';
 import { addFavoriteRecipeBackend } from '../../services/api/recipes';
 import { getRecipeImage } from '../../components/features/RecipeImageHelper';
+import { useAppStore } from '../../store/useAppStore';
 
 export default function RecipeDetailScreen({ route }: any) {
   const recipe = route.params?.recipe;
@@ -20,7 +21,7 @@ export default function RecipeDetailScreen({ route }: any) {
   const handleSaveFavorite = async () => {
     setSaving(true);
     try {
-      await addFavoriteRecipeBackend({
+      const newFav = await addFavoriteRecipeBackend({
         title: recipe.title,
         category: recipe.category,
         time: recipe.time,
@@ -31,6 +32,10 @@ export default function RecipeDetailScreen({ route }: any) {
         nutrition: recipe.nutrition,
         image: recipe.image
       });
+      
+      // Añadir la receta al almacenamiento local en memoria inmediatamente
+      useAppStore.getState().addFavoriteLocal(newFav);
+      
       Alert.alert('Éxito', 'Receta guardada en tus favoritos correctamente.');
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo guardar la receta en favoritos');
